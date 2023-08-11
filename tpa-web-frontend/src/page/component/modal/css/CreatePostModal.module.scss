@@ -1,0 +1,196 @@
+.page-container {
+
+    position: fixed;
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(#f3f3f4, 0.8);
+    z-index: 100;
+
+    .form-container {
+
+        position: relative;
+        margin: auto;
+        background-color: white;
+        width: 30%;
+        border-radius: 6px;
+        padding: 1rem;
+                   
+        .form-title {
+
+            display: flex;
+            height: 4vh;
+            width: 100%;
+
+            h4 {
+                margin: auto;
+            }
+
+            .close-icon {
+                position: absolute;
+                top: 0.6rem;
+                right: 1rem;
+                background-color: var(--default-bg);
+                padding: 0.5rem;
+                border-radius: 50%;
+            }
+
+            .close-icon:hover {
+                background-color: var(--default-bg-hover);
+                cursor: pointer;
+            }
+        }
+
+        .form-body {
+
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-height: var(--default-modal-max-height);
+            gap: 2vh;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            padding-right: 5px;
+
+            .form-body-profile {
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5vw;
+                padding: 1vh 0;
+
+                .profile-icon {
+
+                    width: 2rem;
+                    height: auto;
+                }
+
+                div {
+
+                    display: flex;
+                    flex-direction: column;
+
+                    h5 {
+                        color: rgb(52, 51, 51);
+                        font-weight: 500;
+                    }
+
+                    select {
+
+                        outline: none;
+                        border: none;
+                        background-color: var(--default-bg);
+                        border-radius: var(--default-border-radius);
+                        padding: 0.2rem 0.5rem;
+                        font-size: x-small;
+                        font-weight: bold;
+                    }
+                }
+            }
+
+            .form-content-text {
+
+                width: 100%;
+                height: 100%;
+
+                textarea {
+
+                    width: 100%;
+                    height: 15vh;
+                    border: none;
+                    outline: none;
+                    resize: none;
+                }
+
+                textarea::placeholder {
+                    font-size: large;
+                }
+
+            }
+
+            .form-content-file {
+
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5vw;
+                background-color: var(--default-bg);
+                padding: 1vw;
+                border-radius: var(--default-border-radius);
+                border: var(--default-border);
+
+                .uploaded-file-container {
+
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+
+                    .uploaded-file {
+
+                        width: 100%;
+                        height: auto;
+                        border-radius: var(--default-border-radius);
+
+                    }
+
+                    .delete-file-icon {
+                        position: absolute;
+                        top: 0.5rem;
+                        right: 0.5rem;
+                        background-color: var(--default-bg);
+                        color: red;
+                        padding: 0.25rem;
+                        border-radius: 50%;
+                    }
+
+                    .delete-file-icon:hover {
+                        background-color: var(--default-bg-hover);
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            .form-content-input {
+
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+                border: var(--default-border);
+                border-radius: var(--default-border-radius);
+                box-shadow: var(--default-shadow);
+
+                h5 {
+                    padding: 1vw 1.5vw;
+                    font-weight: 500;
+                }
+
+                div {
+
+                    display: flex;
+                    flex-direction: row;
+                    padding: 1vw;
+                    gap: 0.5rem;
+
+                    .post-icon {
+
+                        width: 1.5rem;
+                        height: auto;
+                    }
+                }
+
+            }
+
+            #post-button {
+                background-color: var(--default-blue-text);
+                padding: 1.2vh 0;
+                font-weight: bold;
+            }
+
+        }
+    }
+
+}
+

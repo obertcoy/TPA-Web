@@ -1,0 +1,21 @@
+type Story{
+    id: ID!
+    fileURL: String!
+    createdAt: Time!
+    user: User! @goField(forceResolver: true)
+}
+
+input NewStory{
+
+    fileURL: String!
+}
+
+extend type Query{
+    getUserStory(userID: ID!): [Story!]!
+    getAllStory: [Story!]!
+}
+
+extend type Mutation{
+    createStory(inputStory: NewStory!): Story!
+    deleteStory(storyID: ID!): Boolean!
+}

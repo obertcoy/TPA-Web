@@ -1,0 +1,169 @@
+.page-container {
+
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+
+    .sidebar {
+
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        width: 20rem;
+        background-color: white;
+        box-shadow: var(--default-shadow);
+        padding: var(--default-sidebar-padding);
+
+        .sidebar-profile {
+
+            display: flex;
+            flex-direction: column;
+            padding: 2em 1em 1em;
+            gap: 1.5vh;
+
+            div {
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+
+                .profile-icon {
+
+                    width: 3.5em;
+                    height: auto;
+                }
+
+                h4 {
+                    color: rgb(58, 57, 57);
+                    font-weight: 600;
+                }
+            }
+
+        }
+
+    }
+
+    @keyframes moving-bg {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+    .page-content {
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80%;
+        min-height: 100%;
+
+        .card-container {
+
+            display: flex;
+            flex-direction: row;
+            gap: 1vw;
+
+            h5 {
+
+                color: white;
+                font-weight: 500;
+            }
+
+            .card-photo-story {
+
+                display: flex;
+                flex-direction: column;
+                height: 20rem;
+                width: 13.5rem;
+                background-image: linear-gradient(55deg,
+                        hsl(209deg 64% 64%) 0%,
+                        hsl(203deg 69% 61%) 10%,
+                        hsl(197deg 71% 57%) 20%,
+                        hsl(193deg 71% 52%) 30%,
+                        hsl(189deg 73% 49%) 40%,
+                        hsl(185deg 73% 47%) 50%,
+                        hsl(191deg 100% 43%) 60%,
+                        hsl(196deg 100% 46%) 70%,
+                        hsl(201deg 100% 47%) 80%,
+                        hsl(215deg 83% 59%) 90%,
+                        hsl(242deg 64% 66%) 100%);
+                border-radius: var(--default-border-radius);
+                box-shadow: var(--default-shadow);
+                gap: 1vh;
+
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+
+            }
+
+            .card-photo-story:hover {
+                background-size: 400%;
+
+                -webkit-animation: moving-bg 8s ease infinite;
+                -moz-animation: moving-bg 8s ease infinite;
+                animation: moving-bg 8s ease infinite;
+            }
+
+            .card-text-story {
+
+                display: flex;
+                flex-direction: column;
+                height: 20rem;
+                width: 13.5rem;
+                background-image: linear-gradient(55deg,
+                        hsl(327deg 78% 51%) 0%,
+                        hsl(324deg 75% 56%) 10%,
+                        hsl(317deg 69% 60%) 20%,
+                        hsl(308deg 62% 63%) 30%,
+                        hsl(295deg 59% 67%) 40%,
+                        hsl(281deg 72% 73%) 50%,
+                        hsl(264deg 78% 78%) 60%,
+                        hsl(248deg 77% 81%) 70%,
+                        hsl(233deg 70% 82%) 80%,
+                        hsl(224deg 56% 82%) 90%,
+                        hsl(217deg 36% 82%) 100%);
+                border-radius: var(--default-border-radius);
+                box-shadow: var(--default-shadow);
+                gap: 1vh;
+
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+
+            }
+
+            .card-text-story:hover{
+                background-size: 400%;
+
+                -webkit-animation: moving-bg 8s ease infinite;
+                -moz-animation: moving-bg 8s ease infinite;
+                animation: moving-bg 8s ease infinite;
+            }
+
+            .icon-container {
+
+                display: flex;
+                width: fit-content;
+                height: fit-content;
+                padding: 0.6em;
+                background-color: white;
+                border-radius: 50%;
+                box-shadow: var(--default-shadow);
+
+                .card-icon {
+
+                    width: 1.4em;
+                    height: auto;
+                    margin: auto;
+                }
+            }
+
+        }
+    }
+
+}

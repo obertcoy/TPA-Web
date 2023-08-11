@@ -1,0 +1,114 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --default-blue-text: #1877f2;
+  --default-bg: #f0f2f5;
+  --default-bg-icon: #dbdde2;
+  --default-border-radius: 6px;
+  --default-border: lightgray 1px solid;
+  --default-padding: 1rem;
+  --default-bg-hover: #e6e8ea;
+  --default-shadow: rgba(0, 0, 0, 0.2) 0px 1px 4px;
+  --default-shadow-bold: rgba(0, 0, 0, 0.3) 4px 4px 12px;
+
+  --default-page-padding: 6vh 0 4vh;
+  --default-sidebar-padding: 4vh 0 0;
+  --default-modal-max-height: 78vh;
+
+  --story-bg-first:  linear-gradient(to left, #085078, #85d8ce);
+  --story-bg-second: linear-gradient(to right, #134e5e, #71b280);
+  --story-bg-third: linear-gradient(55deg,
+      hsl(209deg 64% 64%) 0%,
+      hsl(203deg 69% 61%) 10%,
+      hsl(197deg 71% 57%) 20%,
+      hsl(193deg 71% 52%) 30%,
+      hsl(189deg 73% 49%) 40%,
+      hsl(185deg 73% 47%) 50%,
+      hsl(191deg 100% 43%) 60%,
+      hsl(196deg 100% 46%) 70%,
+      hsl(201deg 100% 47%) 80%,
+      hsl(215deg 83% 59%) 90%,
+      hsl(242deg 64% 66%) 100%);
+  --story-bg-fourth: linear-gradient(55deg,
+      hsl(327deg 78% 51%) 0%,
+      hsl(324deg 75% 56%) 10%,
+      hsl(317deg 69% 60%) 20%,
+      hsl(308deg 62% 63%) 30%,
+      hsl(295deg 59% 67%) 40%,
+      hsl(281deg 72% 73%) 50%,
+      hsl(264deg 78% 78%) 60%,
+      hsl(248deg 77% 81%) 70%,
+      hsl(233deg 70% 82%) 80%,
+      hsl(224deg 56% 82%) 90%,
+      hsl(217deg 36% 82%) 100%);
+  --story-bg-fifth: linear-gradient(to right, #0f2027, #203a43, #2c5364); 
+
+
+    --story-font-first:  Arial;
+    --story-font-second: fantasy;
+    --story-font-third: monospace;
+    --story-font-fouth: Verdana;
+    --story-font-fifth: Century Gothic;
+}
+
+.background-animate {
+  background-size: 400%;
+    
+  -webkit-animation: moving-bg 8s ease infinite;
+  -moz-animation: moving-bg 8s ease infinite;
+  animation: moving-bg 8s ease infinite;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d4d6;
+  border-radius: 10px;
+}
+
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  color: whitesmoke;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-weight: bold;
+
+}
+
+input {
+  padding: max(1vw, 12px);
+  border-radius: 5px;
+  border: lightgray 1px solid;
+}
+
+hr {
+  border-top: #e7e9ec 1px solid;
+}
+
+a {
+  color: #1877f2;
+  text-decoration: none;
+
+}

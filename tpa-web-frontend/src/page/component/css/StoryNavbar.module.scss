@@ -1,0 +1,126 @@
+.page-container {
+
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+
+    .sidebar-container {
+
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        width: 20rem;
+        background-color: white;
+        box-shadow: var(--default-shadow);
+        padding: var(--default-sidebar-padding);
+        
+        .sidebar {
+            
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vh;
+            padding: 1em 1em;
+            
+            h4 {
+                color: rgb(58, 57, 57);
+                font-weight: 600;
+                
+            }
+
+            div {
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+                a {
+                    font-size: small;
+                }
+
+                .create-icon {
+
+                    margin: auto;
+                    height: auto;
+                    width: 1.2em;
+                    color: var(--default-blue-text);
+                    padding: 1em;
+                    border-radius: 50%;
+                    background-color: var(--default-bg);
+                    margin: 0;
+                    cursor: pointer;
+                }
+
+                .create-icon:hover{
+                    background-color: var(--default-bg-hover);
+                }
+
+                .profile-icon{
+
+                    width: 2.75em;
+                    height: auto;
+                    border-radius: 50%;
+                    border: 3px solid var(--default-blue-text);
+                    background-color: white;
+                }
+
+                div {
+
+                    display: flex;
+                    flex-direction: column;
+                    align-items: baseline;
+                    margin-left: 0.25rem;
+                    gap: 0;
+
+                    h5{
+                        font-weight: 600;
+                    }
+                    p{
+                        font-size: 12px;
+                        color: gray;
+                    }
+                    
+                }
+
+               
+            }
+
+        }
+    }
+}
+
+.user-story-card{
+    
+    border-radius: var(--default-border-radius);
+    padding: 0.5em;
+
+    h6{
+        font-weight: 500;
+        color: gray;
+    }
+    cursor: pointer;
+}
+
+.user-story-card-active{
+    
+    background-color: var(--default-bg-hover);
+    border-radius: var(--default-border-radius);
+    padding: 0.5em;
+
+    h6{
+        font-weight: 500;
+        color: gray;
+    }
+}
+
+.user-story-card:hover{
+    
+    background-color: whitesmoke;
+}
+
+.child-container{
+
+    width: 100%;
+    height: 100%;
+    margin-left: 20rem;
+}
