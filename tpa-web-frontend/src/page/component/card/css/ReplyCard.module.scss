@@ -1,0 +1,128 @@
+.card-container {
+
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+
+    .card-body {
+
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+
+        .profile-icon {
+
+            width: 2em;
+            height: auto;
+
+        }
+
+        div {
+
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            // background-color: var(--default-bg); 
+            border-radius: 10px;
+            padding: 0.2em 0.8em;
+
+            h5 {
+                font-weight: 500;
+            }
+
+            p {
+                font-size: small;
+                cursor: pointer;
+            }
+
+            div {
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 1em;
+                padding: 0;
+                color: gray;
+
+                h6 {
+                    font-weight: 400;
+                }
+
+                p {
+                    font-size: x-small;
+                    font-weight: 500;
+                }
+
+            }
+        }
+
+        .heart-icon {
+            margin: auto;
+            margin-right: 0.5em;
+            cursor: pointer;
+        }
+
+        .heart-icon-active {
+            margin: auto;
+            margin-right: 0.5em;
+            cursor: pointer;
+            color: red;
+        }
+
+    }
+
+    .reply-input-container {
+
+        display: flex;
+        flex-direction: row;
+        width: 90%;
+        background-color: white;
+
+        .reply-input {
+
+            display: flex;
+            gap: 0.5vw;
+            flex-direction: row;
+            padding: 0.5em;
+            width: 100%;
+
+            .profile-icon {
+
+                width: 1.5em;
+                height: auto;
+                margin-bottom: auto;
+            }
+
+            div {
+
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                background-color: var(--default-bg);
+                border-radius: 10px;
+                align-items: center;
+
+
+                .send-icon {
+                    margin: auto;
+                    color: gray;
+                }
+
+                .send-icon:hover {
+                    color: var(--default-blue-text);
+                }
+
+                input {
+
+                    background-color: transparent;
+                    color: black;
+                    border: none;
+                    outline: none;
+                    padding: 0.8em;
+                    width: 85%;
+                }
+            }
+
+        }
+    }
+}

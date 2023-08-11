@@ -1,0 +1,205 @@
+$fb-blue :#1877f2;
+$default-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
+$post-gap: 2.5vh;
+$card-content-padding: 1rem;
+
+.page-container {
+
+    width: 100%;
+    height: 100%;
+    padding: var(--default-page-padding);
+
+    .post-container {
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 35%;
+        margin: auto;
+        margin-top: $post-gap;
+        gap: $post-gap;
+
+        .header-card {
+
+            background-color: white;
+            border-radius: 6px;
+            width: 100%;
+            box-shadow: $default-shadow;
+
+            .header-title-container {
+
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                height: 3rem;
+
+                div {
+
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    width: 50%;
+
+
+                    .header-title-icon {
+
+                        height: 1.4rem;
+                        width: auto;
+                    }
+                }
+
+                .header-title-active {
+
+                    border-bottom: 2px solid $fb-blue;
+                    height: 100%;
+                    color: $fb-blue;
+
+                    .header-title-icon {
+                        color: $fb-blue;
+                    }
+
+                }
+            }
+
+            .header-content-container {
+
+                display: flex;
+                flex-direction: row;
+                height: 100%;
+                width: 100%;
+                padding: 1rem;
+                gap: 1rem;
+
+                .create-card {
+
+                    display: flex;
+                    flex-direction: column;
+                    height: 20vh;
+                    background-color: rgb(229, 226, 226);
+                    border-radius: 10px;
+                    box-shadow: var(--default-shadow);
+                    align-items: center;
+                    justify-content: end;
+                    width: calc(100%/6);
+                    position: relative;
+
+                    .create-icon-container {
+
+                        display: flex;
+                        width: fit-content;
+                        height: fit-content;
+                        background-color: white;
+                        padding: 0.3em;
+                        border-radius: 50%;
+                        position: absolute;
+                        bottom: calc(100%/7);
+                        cursor: pointer;
+                        overflow: hidden;
+
+                        .create-icon {
+                            margin: auto;
+                            height: auto;
+                            width: 1.7em;
+                            color: $fb-blue;
+                        }
+                    }
+
+                    .create-card-text{
+
+                        display: flex;
+                        align-items: end;
+                        justify-content: center;
+                        background-color: white;
+                        width: 100%;
+                        height: calc(100%/5);
+                        border-radius: 0 0 10px 10px;
+                        padding: 0 0 0.5em 0;
+
+                    }
+
+                    .overlay{
+                        display: none;
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgba(0, 0, 0, 0.25);
+                        border-radius: 10px;
+                    }
+                }
+
+                .create-card:hover > .overlay{
+                    display: block;
+                }
+            }
+
+        }
+
+        .create-post-container {
+
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background-color: white;
+            border-radius: 6px;
+
+            .create-post-input {
+
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+
+                padding: $card-content-padding;
+                gap: 1vw;
+
+                .profile-icon {
+                    width: auto;
+                    height: 2rem;
+                }
+
+                button {
+                    background-color: #f0f2f5;
+                    width: 85%;
+                    color: gray;
+                    font-weight: lighter;
+                    border-radius: 50px;
+                    padding: 1vh 1vw;
+                    text-align: left;
+                }
+
+                button:hover {
+                    background-color: var(--default-bg-hover);
+                }
+            }
+
+            .create-post-decor {
+
+                display: flex;
+                flex-direction: row;
+                padding: $card-content-padding;
+                width: 90%;
+                justify-content: center;
+                margin: auto;
+                align-items: center;
+
+                div {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    gap: 0.5vw;
+
+                    p {
+                        font-size: small;
+                        color: gray;
+                        font-weight: 500;
+                    }
+                }
+            }
+
+        }
+
+    }
+}

@@ -1,0 +1,54 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Time
+
+directive @auth on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+type User {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  gender: String!
+  dob: Time!
+  activated: Boolean!
+  profileImageURL: String
+  friend: [User!] 
+}
+
+type UserAuthorization {
+  user: User!
+  token: String!
+}
+
+input LoginCredential {
+  email: String!
+  password: String!
+}
+
+input NewUser {
+  first_name: String!
+  last_name: String!
+  email: String!
+  gender: String!
+  dob: Time!
+  password: String!
+}
+
+type Query {
+  getUser(id: ID!): User!
+  getAllUser: [User!]!
+}
+
+type Mutation {
+  createUser(inputUser: NewUser!): User!
+  activateUser(token: String!): Boolean!
+  sendChangePassword(email: String!): Boolean!
+  verifyChangePasswordToken(email: String!, token: String!): Boolean!
+  changePassword(email: String!, newPassword: String!): Boolean!
+  updateUser(id: ID!, inputUser: NewUser!): User!
+  deleteUser(id: ID!): User!
+  loginUser(inputCredential: LoginCredential!): UserAuthorization!
+}

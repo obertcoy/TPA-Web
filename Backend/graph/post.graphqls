@@ -1,0 +1,56 @@
+directive @goField(
+  forceResolver: Boolean
+  name: String
+  omittable: Boolean
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+type Post {
+  id: ID!
+  text: String!
+  fileURL: [String]
+  user: User! @goField(forceResolver: true)
+  likedBy: [User]
+  comment: [Comment] @goField(forceResolver: true)
+  sharedBy: [User]
+  tagged: [User]
+  createdAt: Time!
+  type: String!
+}
+
+type Comment {
+  id: ID!
+  text: String!
+  createdAt: Time!
+  user: User! @goField(forceResolver: true)
+  replies: [Comment] @goField(forceResolver: true)
+  parentID: ID
+  likedBy: [User]
+}
+
+input NewPost{
+  text: String!
+  fileURL: [String]
+  taggedID: [String]
+  type: String!
+}
+
+input NewComment{
+  text: String!
+  parentID: String
+}
+
+extend type Query{
+    getAllPost: [Post!]! 
+    getPost(id: ID!): Post! @auth
+    getComment(id: ID!): Comment!
+}
+
+extend type Mutation{
+    createPost(inputPost: NewPost!) : Post! 
+    createComment(inputComment: NewComment!, postID: ID!) : Comment! 
+    likePost(postID: ID!) : Boolean! @auth
+    unlikePost(postID: ID!) : Boolean! @auth
+    likeComment(commentID: ID!) : Boolean! 
+    unlikeComment(commentID: ID!) : Boolean! 
+    sharePost(postID: ID!, sharedTo: ID!): Boolean! @auth
+}

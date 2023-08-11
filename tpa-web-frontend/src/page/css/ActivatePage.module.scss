@@ -1,0 +1,38 @@
+
+.page-container {
+
+    display: flex;
+    align-items: center;
+    background-color: #f0f2f5;
+    height: 100vh;
+    width: 100%;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6vh;
+
+    img {
+        height: 50%;
+        width: auto;
+    }
+
+    button{
+        padding: 2vh 4vw;
+        background-color: #1877f2;
+        font-size: medium;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 6px 12px;
+    }
+
+    h2{
+        font-size: max(2.4vw, 30px);
+        text-shadow: 2px 1px 1px rgb(73, 68, 68);
+        letter-spacing: 1px;
+    }
+
+    #h-success{
+        color: #42b72a;
+    }
+
+    #h-failed{
+        color: rgb(229, 65, 65);
+    }
+}
