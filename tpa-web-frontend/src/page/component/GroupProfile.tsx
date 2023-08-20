@@ -1,5 +1,5 @@
 import style from './css/GroupProfile.module.scss'
-import { BiPlus, BiSolidDoorOpen, BiSolidMessageRounded, BiSolidSmile } from 'react-icons/bi'
+import { BiChevronDown, BiChevronUp, BiPlus, BiSolidDoorOpen, BiSolidMessageRounded, BiSolidSmile } from 'react-icons/bi'
 import { useState, useEffect, useRef } from 'react'
 import { CgProfile } from 'react-icons/cg'
 import CreatePostModal from './modal/CreatePostModal'
@@ -15,7 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ChatRoom } from '../../model/ChatModel'
 import { GO_TO_CHATROOM } from '../../query/ChatQuery'
 import { Group, GroupFile, GroupUser } from '../../model/GroupModel'
-import { APPROVE_REQUEST, CHECK_ADMIN_USER, EDIT_GROUP_BANNER, GET_ALL_GROUP_FILE, GET_ALL_GROUP_USER, GET_GROUP, KICK_MEMBER, LEAVE_GROUP, PROMOTE_MEMBER, REJECT_REQUEST } from '../../query/GroupQuery'
+import { APPROVE_REQUEST, CHECK_ADMIN_USER, EDIT_GROUP_BANNER, GET_ALL_GROUP_FILE, GET_ALL_GROUP_USER, GET_GROUP, KICK_MEMBER, LEAVE_GROUP, PROMOTE_MEMBER, REJECT_REQUEST, UPLOAD_GROUP_FILE } from '../../query/GroupQuery'
 import { HiVideoCamera } from 'react-icons/hi'
 import { IoMdPhotos } from 'react-icons/io'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
@@ -26,7 +26,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { BsCameraFill } from 'react-icons/bs'
 import { InviteGroupModal } from './modal/InviteGroupModal'
 import { ShowUser, User } from '../../model/UserModel'
-import { AiOutlineSearch } from 'react-icons/ai'
+import { AiOutlineDownload, AiOutlineSearch } from 'react-icons/ai'
+import { UserName } from '../../helper/UserHelper'
+import { FaFileDownload } from 'react-icons/fa'
 
 interface GroupProfileProps {
     groupID: string
@@ -65,7 +67,7 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
         }
     })
 
-    const { data: groupUserData } = useQuery<{ getAllGroupUser: GroupUser[] }>(GET_ALL_GROUP_USER, {
+    const { data: groupUserData, refetch: refetchGroupUser } = useQuery<{ getAllGroupUser: GroupUser[] }>(GET_ALL_GROUP_USER, {
         variables: {
             groupID: groupID
         }
@@ -111,6 +113,14 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
     const handleHeader = (header: string) => {
         setActiveHeader(header)
     }
+
+    const handleRefetchGroup = () => {
+        refetchGroup()
+    }
+
+    const handleRefetchGroupUser = () => [
+        refetchGroupUser()
+    ]
 
     const editBannerInputRef = useRef<HTMLInputElement>(null)
     const handleEditBannerClick = () => {
@@ -179,13 +189,89 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
         }
     };
 
-    if (!postsData) {
-        return <p>Loading...</p>
-    }
-
     // MEMBERS 
 
 
+    // FILES
+
+    const [sortOrder, setSortOrder] = useState('desc');
+    const [uploadGroupFile] = useMutation(UPLOAD_GROUP_FILE)
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const filteredFiles = filesData?.getAllGroupFile
+        .filter(files =>
+            (files.fileName).toLowerCase().includes(searchFile.toLowerCase())
+        )
+        .slice()
+        .sort((a, b) => {
+            const aValue = new Date(a.createdAt).getTime()
+            const bValue = new Date(b.createdAt).getTime()
+
+            if (sortOrder === 'asc') {
+                return aValue - bValue
+            } else {
+                return bValue - aValue
+            }
+        }) || []
+
+    const handleSort = () => {
+        setSortOrder(sortOrder == 'asc' ? 'desc' : 'asc');
+    };
+
+    const handleInputFileClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+
+        if (files) {
+
+            const file = files[0]
+            let fileName = file.name
+            let fileRef = ref(firebaseStorage, `group/${groupPageData?.getGroup.name}/${fileName}`);
+
+            let counter = 1;
+
+            while (await getDownloadURL(fileRef).catch(() => null)) {
+                const extensionIndex = fileName.lastIndexOf('.');
+                const baseName = extensionIndex !== -1 ? fileName.slice(0, extensionIndex) : fileName;
+                const extension = extensionIndex !== -1 ? fileName.slice(extensionIndex) : '';
+                fileName = `${baseName} (${counter})${extension}`;
+
+                fileRef = ref(firebaseStorage, `group/${groupPageData?.getGroup.name}/${fileName}`);
+                counter++;
+            }
+
+            toast.promise(
+                uploadBytes(fileRef, file),
+                {
+                    pending: 'Uploading file...',
+                    success: 'File uploaded!',
+                    error: 'File upload failed',
+                }
+            ).then(async (snapshot) => {
+
+                const url = await getDownloadURL(snapshot.ref);
+                await uploadGroupFile({
+                    variables: {
+                        inputGroupFile: {
+                            groupID: groupID,
+                            fileURL: url,
+                            fileName: fileName,
+                            type: file.type
+                        }
+                    }
+                })
+                refetchFiles()
+            })
+
+        }
+    }
+
+    if (!postsData) {
+        return <p>Loading...</p>
+    }
 
     return (
         <>
@@ -306,7 +392,7 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
                         <div className={style['member-card-container']}>
                             {groupUserData?.getAllGroupUser ?
                                 groupUserData?.getAllGroupUser.map((data: GroupUser) => (
-                                    <MemberCard key={data.user.id} data={data} toUserProfile={toUserProfile} authorized={authorized} user={user as User} groupID={groupID} />
+                                    <MemberCard key={data.user.id} data={data} toUserProfile={toUserProfile} authorized={authorized} user={user as User} groupID={groupID} handleRefetchGroupUser={handleRefetchGroupUser} />
                                 ))
                                 : <h4 style={{ color: "gray" }}>No members...</h4>
                             }
@@ -321,17 +407,31 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
                             <div className={style['header-subcontainer']}>
                                 <div className={style['invite-search']}>
                                     <AiOutlineSearch id={style['search-icon']} />
-                                    <input type="text" placeholder='Search Friends' value={searchFile} onChange={(e) => setSearchFile(e.target.value)} />
+                                    <input type="text" placeholder='Search Files' value={searchFile} onChange={(e) => setSearchFile(e.target.value)} />
                                 </div>
-                                <button>Upload File</button>
+                                <button onClick={handleInputFileClick}>Upload File</button>
+                                <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
                             </div>
                         </div>
                         <hr />
                         <div className={style['file-card-container']}>
-                            <button>File Name</button>
-                            <button>Type</button>
-                            <button>Last Modified</button>
+                            <div className={style['header-subcontainer']}>
+                                <div className={style['card-header-name']}><h5>File Name</h5></div>
+                                <div className={style['card-header-type']}><h5>Type</h5></div>
+                                {sortOrder == 'desc' ?
+                                    <div className={style['card-header-date']} onClick={handleSort}><h5>Last Modified <BiChevronDown cl /></h5></div>
+                                    :
+                                    <div className={style['card-header-date']} onClick={handleSort}><h5>Last Modified <BiChevronUp /></h5></div>
+                                }
+                            </div>
 
+                            {filesData?.getAllGroupFile.length ?
+                                filteredFiles.map((data) => (
+                                    <FileCard data={data} />
+                                ))
+                                :
+                                null
+                            }
                         </div>
 
                     </div>
@@ -344,7 +444,7 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
                         <div className={style['pending-member-card-container']}>
                             {groupPageData?.getGroup.pendingUser.length ?
                                 groupPageData?.getGroup.pendingUser.map((data: ShowUser) => (
-                                    <PendingMemberCard key={data.id} data={data} toUserProfile={toUserProfile} groupID={groupID} />
+                                    <PendingMemberCard key={data.id} data={data} toUserProfile={toUserProfile} groupID={groupID} handleRefetchGroup={handleRefetchGroup} />
                                 ))
                                 : <h4 style={{ color: "gray" }}>No requests...</h4>
                             }
@@ -372,11 +472,11 @@ interface MemberCardProps {
     authorized: boolean
     user: User
     groupID: string
+    handleRefetchGroupUser: () => void
 }
 
-function MemberCard({ data, toUserProfile, authorized, user, groupID }: MemberCardProps) {
+function MemberCard({ data, toUserProfile, authorized, user, groupID, handleRefetchGroupUser }: MemberCardProps) {
 
-    const [visible, setVisible] = useState(true)
     const [promoteMember] = useMutation(PROMOTE_MEMBER)
     const [kickMember] = useMutation(KICK_MEMBER)
 
@@ -388,7 +488,7 @@ function MemberCard({ data, toUserProfile, authorized, user, groupID }: MemberCa
                 userID: data.user.id
             }
         })
-        setVisible(false)
+        handleRefetchGroupUser()
     }
 
     const handleKick = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -399,46 +499,95 @@ function MemberCard({ data, toUserProfile, authorized, user, groupID }: MemberCa
                 userID: data.user.id
             }
         })
-        setVisible(false)
-
+        handleRefetchGroupUser()
     }
 
     return (
         <>
-            {visible &&
-                < div className={style['member-card']} onClick={() => toUserProfile(data.user.id)
-                } >
-                    {data.user.profileImageURL ? <img src={data.user.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
-                    < div >
-                        <h5>{data.user.first_name + " " + data.user.last_name}</h5>
-                        <h6>{data.role}</h6>
-                    </div >
-                    {authorized && data.user.id != user?.id &&
-                        <div className={style['button-container']}>
-                            {
-                                data.role == 'Member' ?
-                                    <button id={style['promote-btn']} onClick={(e) => handlePromote(e)}>Promote</button>
-                                    :
-                                    null
-                            }
+            < div className={style['member-card']} onClick={() => toUserProfile(data.user.id)
+            } >
+                {data.user.profileImageURL ? <img src={data.user.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
+                < div >
+                    <h5>{data.user.first_name + " " + data.user.last_name}</h5>
+                    <h6>{data.role}</h6>
+                </div >
+                {authorized && data.user.id != user?.id &&
+                    <div className={style['button-container']}>
+                        {
+                            data.role == 'Member' ?
+                                <button id={style['promote-btn']} onClick={(e) => handlePromote(e)}>Promote</button>
+                                :
+                                null
+                        }
 
-                            <button id={style['kick-btn']} onClick={(e) => handleKick(e)}>Kick</button>
+                        <button id={style['kick-btn']} onClick={(e) => handleKick(e)}>Kick</button>
 
-                        </div>
-                    }
-                </div >}
+                    </div>
+                }
+            </div >
         </>
     )
 
 }
 
+interface FileCardProps {
+    data: GroupFile
+}
+
+function FileCard({ data }: FileCardProps) {
+
+    const handleDownload = () => {
+        const xhr = new XMLHttpRequest()
+        xhr.responseType = 'blob'
+        xhr.onload = () => {
+            const blob = xhr.response
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = data.fileName;
+            link.click();
+
+            window.URL.revokeObjectURL(link.href);
+        }
+        xhr.open('GET', data.fileURL)
+        xhr.send()
+    };
+
+    return (
+        <div className={style['file-card-container']}>
+            <div className={style['card-name']}>
+                <h5>
+                    {data.fileName}
+                </h5>
+            </div>
+            <div className={style['card-type']}>
+                <h5>
+                    {data.type}
+                </h5>
+            </div>
+            <div className={style['card-date']}>
+                <h5>
+                    {new Date(data.createdAt).toLocaleString()}
+                </h5>
+                <h6>
+                    by {UserName(data.user)}
+                </h6>
+            </div>
+            <div className={style['card-download']} onClick={handleDownload}>
+                <AiOutlineDownload id={style['download-icon']} />
+            </div>
+        </div>
+    )
+}
+
+
 interface PendingMemberCardProps {
     data: ShowUser
     toUserProfile: (userID: string) => void
     groupID: string
+    handleRefetchGroup: () => void
 }
 
-function PendingMemberCard({ data, toUserProfile, groupID }: PendingMemberCardProps) {
+function PendingMemberCard({ data, toUserProfile, groupID, handleRefetchGroup }: PendingMemberCardProps) {
 
     const [approveRequest] = useMutation(APPROVE_REQUEST, {
         variables: {
@@ -453,12 +602,24 @@ function PendingMemberCard({ data, toUserProfile, groupID }: PendingMemberCardPr
         }
     })
 
+    const handleApprove = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation()
+        await approveRequest()
+        handleRefetchGroup()
+    }
+
+    const handleReject = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation()
+        await rejectRequest()
+        handleRefetchGroup()
+    }
+
     return (
         <div className={style['pending-member-card']} onClick={() => toUserProfile(data.id)} >
             {data.profileImageURL ? <img src={data.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
             <h5>{data.first_name + " " + data.last_name}</h5>
-            <button id={style['accept-btn']}>Accept</button>
-            <button id={style['reject-btn']}>Reject</button>
+            <button id={style['accept-btn']} onClick={handleApprove}>Accept</button>
+            <button id={style['reject-btn']} onClick={handleReject}>Reject</button>
         </div>
     )
 }
