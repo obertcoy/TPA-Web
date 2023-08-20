@@ -1,0 +1,23 @@
+type Notification {
+  id: ID!
+  user: User! @goField(forceResolver: true)
+  createdAt: Time!
+  text: String!
+  read: Boolean!
+}
+
+input NewNotification {
+  userID: String!
+  text: String!
+}
+
+extend type Query {
+  getAllNotification: [Notification!]!
+  getUserNotification: [Notification!]!
+}
+
+extend type Mutation {
+  createNotification(inputNotification: NewNotification): Boolean!
+  deleteNotification(notificationID: ID!): Boolean!
+  readNotification(notificationID: ID!): Boolean!
+}

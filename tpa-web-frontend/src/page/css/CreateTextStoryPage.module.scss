@@ -30,9 +30,12 @@
 
                 .profile-icon {
 
-                    width: 3.5em;
-                    height: auto;
+                    width: 3.5rem;
+                    height: 3.5rem;
+                    border-radius: 50%;
+                    object-fit: cover;
                 }
+
 
                 h4 {
                     color: rgb(58, 57, 57);

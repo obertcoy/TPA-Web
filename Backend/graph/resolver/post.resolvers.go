@@ -1,4 +1,4 @@
-package graph
+package resolver
 
 // This file will be automatically regenerated based on the schema, any resolver implementations
 // will be copied through when generating and any unknown code will be moved to the end.
@@ -7,9 +7,11 @@ package graph
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/obertcoy/tpa-web/graph"
 	"github.com/obertcoy/tpa-web/graph/model"
 	"github.com/obertcoy/tpa-web/graph/service"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -37,6 +39,11 @@ func (r *mutationResolver) CreatePost(ctx context.Context, inputPost model.NewPo
 	var fileUrl []*string = nil
 	var taggedUsers []*model.User = nil
 
+	user, userErr := service.GetUser(ctx, userID.(string))
+	if userErr != nil {
+		return nil, userErr
+	}
+
 	if inputPost.FileURL != nil {
 		for _, url := range inputPost.FileURL {
 			if url != nil {
@@ -49,9 +56,48 @@ func (r *mutationResolver) CreatePost(ctx context.Context, inputPost model.NewPo
 			if userID != nil {
 				taggedUser, _ := service.GetUser(ctx, *userID)
 				taggedUsers = append(taggedUsers, taggedUser)
+
+				notificationText := fmt.Sprintf("%s %s tagged you in a post.", user.FirstName, user.LastName)
+				notificationInput := &model.NewNotification{
+					UserID: *userID,
+					Text:   notificationText,
+				}
+
+				_, notifErr := r.CreateNotification(ctx, notificationInput)
+				if notifErr != nil {
+					return nil, notifErr
+				}
 			}
 		}
 	}
+
+	regex := regexp.MustCompile(`\(([^)]+)\)`)
+	matches := regex.FindAllStringSubmatch(inputPost.Text, -1)
+
+	for _, match := range matches {
+		if len(match) > 1 {
+			notifUserID := match[1]
+			notificationText := fmt.Sprintf("%s %s mentioned you in a post.", user.FirstName, user.LastName)
+
+			notificationInput := &model.NewNotification{
+				UserID: notifUserID,
+				Text:   notificationText,
+			}
+			_, notifErr := r.CreateNotification(ctx, notificationInput)
+			if notifErr != nil {
+				return nil, notifErr
+			}
+		}
+	}
+
+	// var group *model.Group = nil
+	// if inputPost.GroupID != nil {
+	// 	getGroup, err := service.GetGroup(ctx, *inputPost.GroupID)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	group = getGroup
+	// }
 
 	post := &model.Post{
 		ID:        uuid.NewString(),
@@ -60,8 +106,16 @@ func (r *mutationResolver) CreatePost(ctx context.Context, inputPost model.NewPo
 		UserID:    userID.(string),
 		CreatedAt: time.Now(),
 		Type:      inputPost.Type,
-		Tagged:    taggedUsers,
+		GroupID:    inputPost.GroupID,
 	}
+
+	err := r.Database.Save(&post).Error
+	if err != nil {
+		return nil, err
+	}
+
+	post, _ = service.GetPost(ctx, post.ID)
+	post.Tagged = append(post.Tagged, taggedUsers...)
 
 	return post, r.Database.Save(&post).Error
 }
@@ -69,6 +123,12 @@ func (r *mutationResolver) CreatePost(ctx context.Context, inputPost model.NewPo
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, inputComment model.NewComment, postID string) (*model.Comment, error) {
 	userID := ctx.Value("TokenHeader").(string)
+
+	user, userErr := service.GetUser(ctx, userID)
+	if userErr != nil {
+		return nil, userErr
+	}
+
 	var parentID *string = nil
 
 	if inputComment.ParentID != nil {
@@ -82,6 +142,30 @@ func (r *mutationResolver) CreateComment(ctx context.Context, inputComment model
 		CreatedAt: time.Now(),
 		UserID:    userID,
 		ParentID:  parentID,
+	}
+
+	if parentID == nil {
+
+		notificationText := fmt.Sprintf("%s %s commented on your post.", user.FirstName, user.LastName)
+		notificationInput := &model.NewNotification{
+			UserID: comment.UserID,
+			Text:   notificationText,
+		}
+		_, notifErr := r.CreateNotification(ctx, notificationInput)
+		if notifErr != nil {
+			return nil, notifErr
+		}
+
+	} else {
+		notificationText := fmt.Sprintf("%s %s replied to your comment.", user.FirstName, user.LastName)
+		notificationInput := &model.NewNotification{
+			UserID: comment.UserID,
+			Text:   notificationText,
+		}
+		_, notifErr := r.CreateNotification(ctx, notificationInput)
+		if notifErr != nil {
+			return nil, notifErr
+		}
 	}
 
 	return comment, r.Database.Save(&comment).Error
@@ -98,6 +182,18 @@ func (r *mutationResolver) LikePost(ctx context.Context, postID string) (bool, e
 	}
 
 	post.LikedBy = append(post.LikedBy, user)
+
+	notificationText := fmt.Sprintf("%s %s liked your post.", user.FirstName, user.LastName)
+	notificationInput := &model.NewNotification{
+		UserID: post.UserID,
+		Text:   notificationText,
+	}
+
+	_, notifErr := r.CreateNotification(ctx, notificationInput)
+	if notifErr != nil {
+		return false, notifErr
+	}
+
 	return true, r.Database.Save(&post).Error
 }
 
@@ -111,7 +207,7 @@ func (r *mutationResolver) UnlikePost(ctx context.Context, postID string) (bool,
 		return false, gqlerror.Errorf("Error fetching")
 	}
 
-	err := r.Database.Debug().Model(&post).Association("LikedBy").Delete(user)
+	err := r.Database.Model(&post).Association("LikedBy").Delete(user)
 	if err != nil {
 		return false, fmt.Errorf("Error retrieving post: %v", err)
 	}
@@ -142,7 +238,7 @@ func (r *mutationResolver) UnlikeComment(ctx context.Context, commentID string) 
 		return false, gqlerror.Errorf("Error fetching")
 	}
 
-	err := r.Database.Debug().Model(&comment).Association("LikedBy").Delete(user)
+	err := r.Database.Model(&comment).Association("LikedBy").Delete(user)
 	if err != nil {
 		return false, fmt.Errorf("Error retrieving post: %v", err)
 	}
@@ -152,6 +248,11 @@ func (r *mutationResolver) UnlikeComment(ctx context.Context, commentID string) 
 // SharePost is the resolver for the sharePost field.
 func (r *mutationResolver) SharePost(ctx context.Context, postID string, sharedTo string) (bool, error) {
 	panic(fmt.Errorf("not implemented: SharePost - sharePost"))
+}
+
+// DeletePost is the resolver for the deletePost field.
+func (r *mutationResolver) DeletePost(ctx context.Context, postID string) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeletePost - deletePost"))
 }
 
 // User is the resolver for the user field.
@@ -164,11 +265,25 @@ func (r *postResolver) Comment(ctx context.Context, obj *model.Post) ([]*model.C
 	return obj.Comment, nil
 }
 
+// Group is the resolver for the group field.
+func (r *postResolver) Group(ctx context.Context, obj *model.Post) (*model.Group, error) {
+	return obj.Group, nil
+}
+
 // GetAllPost is the resolver for the getAllPost field.
 func (r *queryResolver) GetAllPost(ctx context.Context) ([]*model.Post, error) {
+	userID := ctx.Value("TokenHeader").(string)
+	currentUser, userErr := service.GetUser(ctx, userID)
+	if userErr != nil {
+		return nil, userErr
+	}
+
 	var posts []*model.Post
 
-	return posts, r.Database.
+	friendSubquery := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", currentUser.ID)
+	specificFriendSubquery := r.Database.Table("user_specificfriends").Select("specific_friend_id").Where("user_id = ?", currentUser.ID)
+
+	err := r.Database.Debug().
 		Order("created_at DESC").
 		Preload("Comment", func(db *gorm.DB) *gorm.DB {
 			return db.Order("created_at DESC")
@@ -178,7 +293,16 @@ func (r *queryResolver) GetAllPost(ctx context.Context) ([]*model.Post, error) {
 		Preload("LikedBy").
 		Preload("SharedBy").
 		Preload("Tagged").
+		Preload("Group").
+		Where("(user_id = ? OR type = 'public' OR (type = 'friends' AND user_id IN (?)) OR (type = 'specific' AND user_id IN (?)))",
+			currentUser.ID, friendSubquery, specificFriendSubquery).
 		Find(&posts).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }
 
 // GetPost is the resolver for the getPost field.
@@ -191,11 +315,64 @@ func (r *queryResolver) GetComment(ctx context.Context, id string) (*model.Comme
 	panic(fmt.Errorf("not implemented: GetComment - getComment"))
 }
 
-// Comment returns CommentResolver implementation.
-func (r *Resolver) Comment() CommentResolver { return &commentResolver{r} }
+// GetUserPost is the resolver for the getUserPost field.
+func (r *queryResolver) GetUserPost(ctx context.Context) ([]*model.Post, error) {
+	userID := ctx.Value("TokenHeader").(string)
+	var posts []*model.Post
 
-// Post returns PostResolver implementation.
-func (r *Resolver) Post() PostResolver { return &postResolver{r} }
+	return posts, r.Database.Where("user_id = ?", userID).
+		Order("created_at DESC").
+		Preload("Comment", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+		Preload("Comment.LikedBy").
+		Preload("Comment.Replies").
+		Preload("LikedBy").
+		Preload("SharedBy").
+		Preload("Tagged").
+		Preload("Group").
+		Find(&posts).Error
+}
+
+// GetAllPostDebug is the resolver for the getAllPostDebug field.
+func (r *queryResolver) GetAllPostDebug(ctx context.Context) ([]*model.Post, error) {
+	var posts []*model.Post
+
+	return posts, r.Database.
+		Order("created_at DESC").
+		Preload("Comment", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+		Preload("Comment.LikedBy").
+		Preload("Comment.Replies").
+		Preload("LikedBy").
+		Preload("SharedBy").
+		Preload("Tagged").
+		Preload("Group").
+		Find(&posts).Error
+}
+
+// GetGroupPost is the resolver for the getGroupPost field.
+func (r *queryResolver) GetGroupPost(ctx context.Context, groupID string) ([]*model.Post, error) {
+
+	var groupPosts []*model.Post
+	return groupPosts, r.Database.Order("created_at DESC").
+		Preload("Comment", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+		Preload("Comment.LikedBy").
+		Preload("Comment.Replies").
+		Preload("LikedBy").
+		Preload("SharedBy").
+		Preload("Tagged").
+		Preload("Group").Where("group_id = ?", groupID).Find(&groupPosts).Error
+}
+
+// Comment returns graph.CommentResolver implementation.
+func (r *Resolver) Comment() graph.CommentResolver { return &commentResolver{r} }
+
+// Post returns graph.PostResolver implementation.
+func (r *Resolver) Post() graph.PostResolver { return &postResolver{r} }
 
 type commentResolver struct{ *Resolver }
 type postResolver struct{ *Resolver }

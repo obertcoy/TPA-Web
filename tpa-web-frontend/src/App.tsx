@@ -13,14 +13,30 @@ import CreatePhotoStoryPage from './page/main/story/CreatePhotoStoryPage'
 import CreateTextStoryPage from './page/main/story/CreateTextStoryPage'
 import StoryNavbar from './page/component/StoryNavbar'
 import StoryPage from './page/main/story/StoryPage'
+import CreateReelPage from './page/main/reel/CreateReelPage'
+import ReelPage from './page/main/reel/ReelPage'
+import UserProfilePage from './page/main/UserProfilePage'
+import FriendsPage from './page/main/FriendsPage'
+import FriendsNavbar from './page/component/FriendsNavbar'
+import ChatsPage from './page/main/ChatsPage'
+import GroupsPage from './page/main/GroupsPage'
 
 function AuthenticatedRoutes() {
   return (
     <MasterLayout>
       <Routes>
         <Route path='home' element={<HomePage />}></Route>
+        <Route path='friends' element={<FriendsPage />}></Route>
         <Route path='create-story/*' element={<CreateStoryRoutes />} />
-        <Route path='*' element={<StoryPageRoute />}></Route>
+        <Route path='stories/*' element={<StoryPageRoute />}></Route>
+        <Route path='reels/' element={<ReelPage />}></Route>
+        <Route path='create-reel' element={<CreateReelPage />}></Route>
+        <Route path='profile/:userID' element={<UserProfilePage />}></Route>
+        <Route path='all-friends/*' element={<FriendsNavbar />}></Route>
+        <Route path='chats/' element={<ChatsPage />}></Route>
+        <Route path='chats/:paramChatRoomID' element={<ChatsPage />}></Route>
+        <Route path='groups/' element={<GroupsPage />}></Route>
+
       </Routes>
     </MasterLayout>
   );
@@ -31,7 +47,7 @@ function StoryPageRoute() {
   return (
     <StoryNavbar>
       <Routes>
-        <Route path='stories/:userID' element={<StoryPage />}></Route>
+        <Route path=':userID' element={<StoryPage />}></Route>
       </Routes>
     </StoryNavbar>
   )
@@ -46,6 +62,7 @@ function CreateStoryRoutes() {
     </Routes>
   )
 }
+
 
 function PublicRoutes() {
   const location = useLocation();

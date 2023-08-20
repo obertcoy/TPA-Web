@@ -1,0 +1,130 @@
+Date : 2023-08-14 00:00:06
+Directory : c:\TPA\TPA-Web\tpa-web-frontend
+Total : 74 files,  17957 codes, 397 comments, 1465 blanks, all 19819 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON               |          3 |     11,599 |          0 |          3 |     11,602 |
+| TypeScript JSX     |         40 |      3,128 |        385 |        483 |      3,996 |
+| SCSS               |         24 |      3,058 |          8 |        942 |      4,008 |
+| CSS                |          1 |         96 |          0 |         20 |        116 |
+| JSON with Comments |          1 |         21 |          2 |          3 |         26 |
+| Markdown           |          1 |         19 |          0 |          9 |         28 |
+| JavaScript         |          1 |         18 |          0 |          1 |         19 |
+| HTML               |          1 |         13 |          0 |          1 |         14 |
+| TypeScript         |          2 |          5 |          2 |          3 |         10 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                     | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                        |         74 |     17,957 |        397 |      1,465 |     19,819 |
+| . (Files)                                                                                |          8 |     11,675 |          3 |         19 |     11,697 |
+| helper                                                                                   |          2 |         24 |          0 |         11 |         35 |
+| src                                                                                      |         64 |      6,258 |        394 |      1,435 |      8,087 |
+| src (Files)                                                                              |          4 |        129 |         69 |         24 |        222 |
+| src\helper                                                                               |          1 |         38 |          0 |          3 |         41 |
+| src\model                                                                                |          4 |         62 |          0 |         11 |         73 |
+| src\page                                                                                 |         49 |      5,410 |        318 |      1,357 |      7,085 |
+| src\page\component                                                                       |         22 |      2,176 |          6 |        528 |      2,710 |
+| src\page\component (Files)                                                               |          4 |        247 |          0 |         58 |        305 |
+| src\page\component\card                                                                  |         10 |        870 |          3 |        190 |      1,063 |
+| src\page\component\card (Files)                                                          |          5 |        429 |          1 |         58 |        488 |
+| src\page\component\card\css                                                              |          5 |        441 |          2 |        132 |        575 |
+| src\page\component\css                                                                   |          4 |        338 |          2 |        112 |        452 |
+| src\page\component\modal                                                                 |          4 |        721 |          1 |        168 |        890 |
+| src\page\component\modal (Files)                                                         |          2 |        335 |          1 |         40 |        376 |
+| src\page\component\modal\css                                                             |          2 |        386 |          0 |        128 |        514 |
+| src\page\css                                                                             |         13 |      1,893 |          4 |        570 |      2,467 |
+| src\page\guest                                                                           |          5 |        339 |          0 |         53 |        392 |
+| src\page\main                                                                            |          9 |      1,002 |        308 |        206 |      1,516 |
+| src\page\main (Files)                                                                    |          3 |        307 |        228 |         57 |        592 |
+| src\page\main\reel                                                                       |          2 |        330 |         45 |         70 |        445 |
+| src\page\main\story                                                                      |          4 |        365 |         35 |         79 |        479 |
+| src\provider                                                                             |          2 |         30 |          7 |         10 |         47 |
+| src\query                                                                                |          4 |        589 |          0 |         30 |        619 |
++------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                 | language           | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\TPA\TPA-Web\tpa-web-frontend\.eslintrc.cjs                                            | JavaScript         |         18 |          0 |          1 |         19 |
+| c:\TPA\TPA-Web\tpa-web-frontend\README.md                                                | Markdown           |         19 |          0 |          9 |         28 |
+| c:\TPA\TPA-Web\tpa-web-frontend\helper\JWTToken.tsx                                      | TypeScript JSX     |         16 |          0 |          7 |         23 |
+| c:\TPA\TPA-Web\tpa-web-frontend\helper\UserHelper.tsx                                    | TypeScript JSX     |          8 |          0 |          4 |         12 |
+| c:\TPA\TPA-Web\tpa-web-frontend\index.html                                               | HTML               |         13 |          0 |          1 |         14 |
+| c:\TPA\TPA-Web\tpa-web-frontend\package-lock.json                                        | JSON               |     11,551 |          0 |          1 |     11,552 |
+| c:\TPA\TPA-Web\tpa-web-frontend\package.json                                             | JSON               |         38 |          0 |          1 |         39 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\App.tsx                                              | TypeScript JSX     |         24 |         68 |          1 |         93 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\helper\DateHelper.tsx                                | TypeScript JSX     |         38 |          0 |          3 |         41 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\index.css                                            | CSS                |         96 |          0 |         20 |        116 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\main.tsx                                             | TypeScript JSX     |          9 |          0 |          2 |         11 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\PostModel.tsx                                  | TypeScript JSX     |         24 |          0 |          4 |         28 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\ReelModel.tsx                                  | TypeScript JSX     |         12 |          0 |          3 |         15 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\StoryModel.tsx                                 | TypeScript JSX     |          7 |          0 |          1 |          8 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\UserModel.tsx                                  | TypeScript JSX     |         19 |          0 |          3 |         22 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\MasterLayout.tsx                      | TypeScript JSX     |         28 |          0 |          4 |         32 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\Navbar.tsx                            | TypeScript JSX     |         91 |          0 |         20 |        111 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\ReelNavbar.tsx                        | TypeScript JSX     |         45 |          0 |         13 |         58 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\StoryNavbar.tsx                       | TypeScript JSX     |         83 |          0 |         21 |        104 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\CommentCard.tsx                  | TypeScript JSX     |        143 |          1 |         21 |        165 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\HomeReelCard.tsx                 | TypeScript JSX     |         17 |          0 |          3 |         20 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\HomeStoryCard.tsx                | TypeScript JSX     |         19 |          0 |          3 |         22 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\PostCard.tsx                     | TypeScript JSX     |        121 |          0 |         10 |        131 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\ReplyCard.tsx                    | TypeScript JSX     |        129 |          0 |         21 |        150 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\CommentCard.module.scss      | SCSS               |        103 |          1 |         31 |        135 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\HomeReelCard.module.scss     | SCSS               |         45 |          0 |         10 |         55 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\HomeStoryCard.module.scss    | SCSS               |         57 |          0 |         10 |         67 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\PostCard.module.scss         | SCSS               |        137 |          0 |         48 |        185 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\ReplyCard.module.scss        | SCSS               |         99 |          1 |         33 |        133 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\MasterLayout.module.scss          | SCSS               |         11 |          0 |          5 |         16 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\Navbar.module.scss                | SCSS               |        145 |          2 |         47 |        194 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\ReelNavbar.module.scss            | SCSS               |         86 |          0 |         28 |        114 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\StoryNavbar.module.scss           | SCSS               |         96 |          0 |         32 |        128 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\CreatePostModal.tsx             | TypeScript JSX     |        152 |          1 |         22 |        175 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\PostModal.tsx                   | TypeScript JSX     |        183 |          0 |         18 |        201 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\css\CreatePostModal.module.scss | SCSS               |        151 |          0 |         49 |        200 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\css\PostModal.module.scss       | SCSS               |        235 |          0 |         79 |        314 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\ActivatePage.module.scss                    | SCSS               |         31 |          0 |          7 |         38 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\ChangePasswordPage.module.scss              | SCSS               |         43 |          0 |         15 |         58 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\CreatePhotoStoryPage.module.scss            | SCSS               |        139 |          0 |         47 |        186 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\CreateReelPage.module.scss                  | SCSS               |        165 |          0 |         53 |        218 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\CreateStoryPage.module.scss                 | SCSS               |        135 |          0 |         38 |        173 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\CreateTextStoryPage.module.scss             | SCSS               |        229 |          0 |         61 |        290 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\ForgotPage.module.scss                      | SCSS               |         43 |          0 |         15 |         58 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\HomePage.module.scss                        | SCSS               |        165 |          0 |         46 |        211 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\LoginPage.module.scss                       | SCSS               |         76 |          0 |         27 |        103 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\ReelPage.module.scss                        | SCSS               |        230 |          0 |         77 |        307 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\RegisterPage.module.scss                    | SCSS               |         69 |          0 |         14 |         83 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\StoryPage.module.scss                       | SCSS               |         93 |          1 |         29 |        123 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\UserProfilePage.module.scss                 | SCSS               |        475 |          3 |        141 |        619 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\guest\ActivatePage.tsx                          | TypeScript JSX     |         37 |          0 |          9 |         46 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\guest\ChangePassword.tsx                        | TypeScript JSX     |         83 |          0 |         13 |         96 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\guest\ForgotPage.tsx                            | TypeScript JSX     |         59 |          0 |          6 |         65 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\guest\LoginPage.tsx                             | TypeScript JSX     |         73 |          0 |         12 |         85 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\guest\RegisterPage.tsx                          | TypeScript JSX     |         87 |          0 |         13 |        100 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\FriendsPage.tsx                            | TypeScript JSX     |          0 |          0 |          1 |          1 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\HomePage.tsx                               | TypeScript JSX     |        162 |          0 |         19 |        181 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\UserProfilePage.tsx                        | TypeScript JSX     |        145 |        228 |         37 |        410 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\reel\CreateReelPage.tsx                    | TypeScript JSX     |        134 |         45 |         28 |        207 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\reel\ReelPage.tsx                          | TypeScript JSX     |        196 |          0 |         42 |        238 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\story\CreatePhotoStoryPage.tsx             | TypeScript JSX     |        108 |         35 |         26 |        169 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\story\CreateStoryPage.tsx                  | TypeScript JSX     |         46 |          0 |          7 |         53 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\story\CreateTextStoryPage.tsx              | TypeScript JSX     |        137 |          0 |         20 |        157 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\story\StoryPage.tsx                        | TypeScript JSX     |         74 |          0 |         26 |        100 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\provider\ApolloProvider.tsx                          | TypeScript JSX     |         17 |          0 |          7 |         24 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\provider\FirebaseProvider.tsx                        | TypeScript JSX     |         13 |          7 |          3 |         23 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\PostQuery.tsx                                  | TypeScript JSX     |        167 |          0 |          6 |        173 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\ReelQuery.tsx                                  | TypeScript JSX     |        228 |          0 |          7 |        235 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\StoryQuery.tsx                                 | TypeScript JSX     |         46 |          0 |          3 |         49 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\UserQuery.tsx                                  | TypeScript JSX     |        148 |          0 |         14 |        162 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\vite-env.d.ts                                        | TypeScript         |          0 |          1 |          1 |          2 |
+| c:\TPA\TPA-Web\tpa-web-frontend\tsconfig.json                                            | JSON with Comments |         21 |          2 |          3 |         26 |
+| c:\TPA\TPA-Web\tpa-web-frontend\tsconfig.node.json                                       | JSON               |         10 |          0 |          1 |         11 |
+| c:\TPA\TPA-Web\tpa-web-frontend\vite.config.ts                                           | TypeScript         |          5 |          1 |          2 |          8 |
+| Total                                                                                    |                    |     17,957 |        397 |      1,465 |     19,819 |
++------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

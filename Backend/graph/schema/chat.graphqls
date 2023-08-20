@@ -1,0 +1,41 @@
+type ChatRoom {
+    id:ID!
+    user: [User!] @goField(forceResolver: true)
+    createdAt: Time!
+    chat: [Chat!] @goField(forceResolver: true)
+    group: Group @goField(forceResolver: true)
+}
+
+type Chat{
+    id: ID!
+    text: String
+    fileURL: String
+    createdAt: Time!
+    user: User! @goField(forceResolver: true)
+}
+
+input NewChatRoom{
+    userID:[String!]
+    groupID: String
+}
+
+input NewChat{
+    text: String
+    fileURL: String
+    chatRoomID: String!
+}
+
+extend type Query{
+    getAllChatRoom: [ChatRoom!]
+    getChatRoom(chatRoomID: ID!): ChatRoom!
+}
+
+type Subscription{
+    getChat(chatRoomID: ID!): [Chat!]
+}
+
+extend type Mutation{
+    createChatRoom(inputChatRoom: NewChatRoom!): ChatRoom!
+    goToChatRoom(inputChatRoom: NewChatRoom!): ChatRoom!
+    createChat(inputChat: NewChat!): Chat!
+}
