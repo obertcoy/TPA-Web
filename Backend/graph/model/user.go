@@ -20,8 +20,6 @@ type User struct {
 	PendingFriend  []*User         `json:"pendingFriend,omitempty" gorm:"many2many:user_pendingfriends;associationForeignKey:UserID;joinForeignKey:PendingFriendID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	BlockedUser    []*User         `json:"blockedUser,omitempty" gorm:"many2many:user_blockedusers;associationForeignKey:UserID;joinForeignKey:BlockedUserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	SpecificFriend []*User         `json:"specificFriend,omitempty" gorm:"many2many:user_specificfriends;associationForeignKey:UserID;joinForeignKey:SpecificFriendID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Notification   []*Notification `json:"notification,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	NotificationID []*string        `json:"notificationID, omitempty" gorm:"json"`
 
 	GroupInvite     []*Group        `json:"groupInvite,omitempty" gorm:"many2many:user_groupinvites;associationForeignKey:GroupID;joinForeignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 

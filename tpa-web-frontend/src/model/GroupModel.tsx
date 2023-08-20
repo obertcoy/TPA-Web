@@ -6,7 +6,6 @@ export interface Group{
     bannerImageURL: string
     user: ShowUser[]
     pendingUser: ShowUser[]
-    groupFile: GroupFile[]
     createdAt: Date
 }
 

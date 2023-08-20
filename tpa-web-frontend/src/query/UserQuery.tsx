@@ -157,6 +157,11 @@ query GetUser($id: ID!){
       last_name
       profileImageURL
     }
+    groupInvite{
+      id
+      name
+      bannerImageURL
+    }
   }
   }
 `
@@ -247,3 +252,15 @@ export const REMOVE_SPECIFIC_FRIEND = gql`
 mutation RemoveSpecificFriend($friendID:ID!){
   removeSpecificFriend(friendID: $friendID)
 }`
+
+export const ACCEPT_GROUP_INVITE = gql`
+mutation AcceptGroupInvite($groupID: ID!){
+  acceptGroupInvite(groupID: $groupID)
+}
+`
+
+export const REJECT_GROUP_INVITE = gql`
+mutation RejectGroupInvite($groupID: ID!){
+  rejectGroupInvite(groupID: $groupID)
+}
+`

@@ -290,26 +290,39 @@ func (r *mutationResolver) AcceptGroupInvite(ctx context.Context, groupID string
 		return false, groupErr
 	}
 
-	err = r.Database.Model(&user).Association("GroupInvite").Delete(&group)
+	var invitesToDelete []*model.Group
+	for _, invite := range user.GroupInvite {
+		if invite.ID == groupID {
+			invitesToDelete = append(invitesToDelete, invite)
+		}
+	}
+
+	err = r.Database.Model(&user).Association("GroupInvite").Delete(&invitesToDelete)
 	if err != nil {
 		return false, err
 	}
 
-	err = r.Database.Model(&group).Association("User").Append(&user)
+	err = r.Database.Model(&group).Association("User").Append(user)
 	if err != nil {
 		return false, err
 	}
 
 	userRole := &model.UserGroupRole{
 		UserID:  userID,
-		GroupID: userID,
+		GroupID: groupID,
 		Role:    "Member",
 	}
-	err = r.Database.Save(&userRole).Error
+	err = r.Database.Save(userRole).Error
 
 	if err != nil {
 		return false, err
 	}
+
+	_, err = service.AddUserToGroupChat(ctx, userID, groupID)
+	if err != nil {
+		return false, err
+	}
+
 	return true, err
 }
 
@@ -328,7 +341,7 @@ func (r *mutationResolver) RejectGroupInvite(ctx context.Context, groupID string
 		return false, groupErr
 	}
 
-	err = r.Database.Model(&user).Association("GroupInvite").Delete(&group)
+	err = r.Database.Model(&user).Association("GroupInvite").Delete(group)
 	if err != nil {
 		return false, err
 	}
@@ -345,21 +358,15 @@ func (r *queryResolver) GetUser(ctx context.Context, id string) (*model.User, er
 func (r *queryResolver) GetAllUser(ctx context.Context) ([]*model.User, error) {
 	var users []*model.User
 
-	return users, r.Database.Preload("Friend").Preload("PendingFriend").Preload("BlockedUser").Preload("SpecificFriend").Preload("GroupInvite").Preload("Notification").Find(&users).Error
+	return users, r.Database.Preload("Friend").Preload("PendingFriend").Preload("BlockedUser").Preload("SpecificFriend").Preload("GroupInvite").Find(&users).Error
 }
 
 // GetAllNonFriend is the resolver for the getAllNonFriend field.
 func (r *queryResolver) GetAllNonFriend(ctx context.Context, id string) ([]*model.User, error) {
 	var users []*model.User
-
 	friendSubquery := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", id)
 
-	return users, r.Database.Where("id != ? AND id NOT IN (?)", id, friendSubquery).Preload("Friend").Preload("PendingFriend").Preload("BlockedUser").Preload("SpecificFriend").Preload("GroupInvite").Preload("Notification").Find(&users).Error
-}
-
-// Notification is the resolver for the notification field.
-func (r *userResolver) Notification(ctx context.Context, obj *model.User) ([]*model.Notification, error) {
-	return obj.Notification, nil
+	return users, r.Database.Where("id != ? AND id NOT IN (?)", id, friendSubquery).Preload("Friend").Preload("PendingFriend").Preload("BlockedUser").Preload("SpecificFriend").Preload("GroupInvite").Find(&users).Error
 }
 
 // GroupInvite is the resolver for the groupInvite field.

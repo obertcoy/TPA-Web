@@ -4,7 +4,6 @@ type Group{
     bannerImageURL: String
     user:[User!] @goField(forceResolver: true)
     createdAt: Time!
-    groupFile: [GroupFile!] @goField(forceResolver: true)
     pendingUser: [User!]
 }
 
@@ -41,6 +40,7 @@ extend type Query{
 
     checkAdminUser(groupID: ID!): Boolean!
     getAllGroupUser(groupID: ID!): [GroupUser!]
+    getNonMemberUser(groupID: ID!): [User!]
 }
 
 extend type Mutation{
@@ -48,10 +48,12 @@ extend type Mutation{
     createGroup(inputGroup: NewGroup!): Group!
     promoteMember(groupID: ID!, userID: ID!): Boolean!
     approveRequest(groupID: ID!, userID: ID!): Boolean!
+    rejectRequest(groupID: ID!, userID: ID!): Boolean!
     kickMember(groupID: ID!, userID: ID!): Boolean!
     editGroupBanner(groupID: ID!, fileURL: String!): Boolean!
-    deleteGroupFile(groupID: ID!, fileID: String!): Boolean!
+    deleteGroupFile(groupID: ID!, fileID: ID!): Boolean!
     inviteFriend(groupID: ID!, userID: ID!): Boolean!
     requestJoinGroup(groupID:ID!): Boolean!
     leaveGroup(groupID: ID!): Boolean!
+    checkMember(groupID: ID!): Boolean!
 }

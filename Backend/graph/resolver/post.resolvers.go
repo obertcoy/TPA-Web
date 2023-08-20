@@ -106,7 +106,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, inputPost model.NewPo
 		UserID:    userID.(string),
 		CreatedAt: time.Now(),
 		Type:      inputPost.Type,
-		GroupID:    inputPost.GroupID,
+		GroupID:   inputPost.GroupID,
 	}
 
 	err := r.Database.Save(&post).Error
@@ -282,8 +282,9 @@ func (r *queryResolver) GetAllPost(ctx context.Context) ([]*model.Post, error) {
 
 	friendSubquery := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", currentUser.ID)
 	specificFriendSubquery := r.Database.Table("user_specificfriends").Select("specific_friend_id").Where("user_id = ?", currentUser.ID)
+	groupSubquery := r.Database.Table("user_group_roles").Select("group_id").Where("user_id = ?", userID)
 
-	err := r.Database.Debug().
+	err := r.Database.
 		Order("created_at DESC").
 		Preload("Comment", func(db *gorm.DB) *gorm.DB {
 			return db.Order("created_at DESC")
@@ -295,7 +296,7 @@ func (r *queryResolver) GetAllPost(ctx context.Context) ([]*model.Post, error) {
 		Preload("Tagged").
 		Preload("Group").
 		Where("(user_id = ? OR type = 'public' OR (type = 'friends' AND user_id IN (?)) OR (type = 'specific' AND user_id IN (?)))",
-			currentUser.ID, friendSubquery, specificFriendSubquery).
+			currentUser.ID, friendSubquery, specificFriendSubquery).Where("group_id IS NULL OR group_id IN (?)", groupSubquery).
 		Find(&posts).Error
 
 	if err != nil {
@@ -354,7 +355,6 @@ func (r *queryResolver) GetAllPostDebug(ctx context.Context) ([]*model.Post, err
 
 // GetGroupPost is the resolver for the getGroupPost field.
 func (r *queryResolver) GetGroupPost(ctx context.Context, groupID string) ([]*model.Post, error) {
-
 	var groupPosts []*model.Post
 	return groupPosts, r.Database.Order("created_at DESC").
 		Preload("Comment", func(db *gorm.DB) *gorm.DB {

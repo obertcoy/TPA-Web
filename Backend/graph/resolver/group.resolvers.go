@@ -6,7 +6,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,11 +17,6 @@ import (
 // User is the resolver for the user field.
 func (r *groupResolver) User(ctx context.Context, obj *model.Group) ([]*model.User, error) {
 	return obj.User, nil
-}
-
-// GroupFile is the resolver for the groupFile field.
-func (r *groupResolver) GroupFile(ctx context.Context, obj *model.Group) ([]*model.GroupFile, error) {
-	return obj.GroupFile, nil
 }
 
 // User is the resolver for the user field.
@@ -61,7 +55,7 @@ func (r *mutationResolver) CreateGroup(ctx context.Context, inputGroup model.New
 	if err != nil {
 		return nil, err
 	}
-	
+
 	userRole := &model.UserGroupRole{
 		UserID:  userID,
 		GroupID: groupID,
@@ -77,14 +71,14 @@ func (r *mutationResolver) CreateGroup(ctx context.Context, inputGroup model.New
 	usersID = append(usersID, userID)
 
 	chatRoom := &model.NewChatRoom{
-		UserID: usersID,
+		UserID:  usersID,
 		GroupID: &groupID,
 	}
 	_, err = r.CreateChatRoom(ctx, *chatRoom)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return group, nil
 }
 
@@ -132,6 +126,33 @@ func (r *mutationResolver) ApproveRequest(ctx context.Context, groupID string, u
 	}
 
 	err = r.Database.Model(&group).Association("PendingUser").Delete(&user)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = service.AddUserToGroupChat(ctx, userID, groupID)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// RejectRequest is the resolver for the rejectRequest field.
+func (r *mutationResolver) RejectRequest(ctx context.Context, groupID string, userID string) (bool, error) {
+	user, userErr := service.GetUser(ctx, userID)
+
+	if userErr != nil {
+		return false, userErr
+	}
+
+	group, groupErr := service.GetGroup(ctx, groupID)
+
+	if groupErr != nil {
+		return false, groupErr
+	}
+
+	err := r.Database.Model(&group).Association("PendingUser").Delete(&user)
 	if err != nil {
 		return false, err
 	}
@@ -214,7 +235,7 @@ func (r *mutationResolver) InviteFriend(ctx context.Context, groupID string, use
 		return false, groupErr
 	}
 
-	err = r.Database.Model(&user).Association("GroupInvite").Append(&group)
+	err = r.Database.Debug().Model(&user).Association("GroupInvite").Append(group)
 	if err != nil {
 		return false, err
 	}
@@ -236,7 +257,7 @@ func (r *mutationResolver) RequestJoinGroup(ctx context.Context, groupID string)
 		return false, groupErr
 	}
 
-	err = r.Database.Model(&group).Association("PendingUser").Append(&user)
+	err = r.Database.Model(&group).Association("PendingUser").Append(user)
 	if err != nil {
 		return false, err
 	}
@@ -259,7 +280,19 @@ func (r *mutationResolver) LeaveGroup(ctx context.Context, groupID string) (bool
 		return false, err
 	}
 
-	err = r.Database.Model(&group).Association("User").Delete(&user)
+	err = r.Database.Model(&group).Association("User").Delete(user)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// CheckMember is the resolver for the checkMember field.
+func (r *mutationResolver) CheckMember(ctx context.Context, groupID string) (bool, error) {
+	userID := ctx.Value("TokenHeader").(string)
+	err := r.Database.Table("user_group_roles").Select("user_id").Where("group_id = ? AND user_id = ?", groupID, userID).Error
+
 	if err != nil {
 		return false, err
 	}
@@ -280,7 +313,10 @@ func (r *queryResolver) GetGroup(ctx context.Context, groupID string) (*model.Gr
 
 // GetAllGroupFile is the resolver for the getAllGroupFile field.
 func (r *queryResolver) GetAllGroupFile(ctx context.Context, groupID string) ([]*model.GroupFile, error) {
-	panic(fmt.Errorf("not implemented: GetAllGroupFile - getAllGroupFile"))
+	var files []*model.GroupFile
+	fileSubquery := r.Database.Table("group_groupfiles").Select("group_file_id").Where("group_id = ?", groupID)
+
+	return files, r.Database.Where("id IN (?)", fileSubquery).Find(files).Error
 }
 
 // CheckAdminUser is the resolver for the checkAdminUser field.
@@ -322,6 +358,16 @@ func (r *queryResolver) GetAllGroupUser(ctx context.Context, groupID string) ([]
 	return groupUsers, nil
 }
 
+// GetNonMemberUser is the resolver for the getNonMemberUser field.
+func (r *queryResolver) GetNonMemberUser(ctx context.Context, groupID string) ([]*model.User, error) {
+	var users []*model.User
+	userID := ctx.Value("TokenHeader").(string)
+
+	userSubquery := r.Database.Table("user_group_roles").Select("user_id").Where("group_id = ?", groupID)
+	friendSubquery := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", userID)
+	return users, r.Database.Where("id NOT IN (?) AND id IN (?)", userSubquery, friendSubquery).Preload("Friend").Preload("PendingFriend").Preload("BlockedUser").Preload("SpecificFriend").Preload("GroupInvite").Find(&users).Error
+}
+
 // Group returns graph.GroupResolver implementation.
 func (r *Resolver) Group() graph.GroupResolver { return &groupResolver{r} }
 
@@ -334,3 +380,4 @@ func (r *Resolver) GroupUser() graph.GroupUserResolver { return &groupUserResolv
 type groupResolver struct{ *Resolver }
 type groupFileResolver struct{ *Resolver }
 type groupUserResolver struct{ *Resolver }
+

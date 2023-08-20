@@ -25,7 +25,7 @@ export default function GroupsPage() {
         variables: {
             id: user?.id
         },
-    })
+    })    
 
     const handleOpenModal = () => {
         setIsModalOpen(!isModalOpen)
@@ -74,7 +74,7 @@ export default function GroupsPage() {
             <div className={style['page-content']} style={{ margin: '0' }}>
                 {selectedGroupID != ''
                     ?
-                    <GroupProfile groupID={selectedGroupID} />
+                    <GroupProfile groupID={selectedGroupID} setSelectedGroupID={setselectedGroupID}/>
                     :
                     <h3 style={{ color: 'gray', marginTop: '50vh', marginLeft: '60vw' }}>Select a profile</h3>
                 }

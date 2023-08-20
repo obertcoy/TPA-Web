@@ -68,7 +68,7 @@ export default function FriendsNavbar() {
                     ?
                     <FriendProfile userID={selectedFriendID} />
                     :
-                    <h3 style={{ color: 'gray', marginTop: '50vh', marginLeft: '40vw' }}>Select a profile</h3>
+                    <h3 style={{ color: 'gray', marginTop: '50vh', marginLeft: '60vw' }}>Select a profile</h3>
                 }
             </div>
 

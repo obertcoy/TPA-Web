@@ -90,7 +90,6 @@ type ComplexityRoot struct {
 	Group struct {
 		BannerImageURL func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
-		GroupFile      func(childComplexity int) int
 		ID             func(childComplexity int) int
 		Name           func(childComplexity int) int
 		PendingUser    func(childComplexity int) int
@@ -119,6 +118,7 @@ type ComplexityRoot struct {
 		ApproveRequest            func(childComplexity int, groupID string, userID string) int
 		BlockUser                 func(childComplexity int, userID string) int
 		ChangePassword            func(childComplexity int, email string, newPassword string) int
+		CheckMember               func(childComplexity int, groupID string) int
 		CreateChat                func(childComplexity int, inputChat model.NewChat) int
 		CreateChatRoom            func(childComplexity int, inputChatRoom model.NewChatRoom) int
 		CreateComment             func(childComplexity int, inputComment model.NewComment, postID string) int
@@ -149,6 +149,7 @@ type ComplexityRoot struct {
 		ReadNotification          func(childComplexity int, notificationID string) int
 		RejectFriendRequest       func(childComplexity int, friendID string) int
 		RejectGroupInvite         func(childComplexity int, groupID string) int
+		RejectRequest             func(childComplexity int, groupID string, userID string) int
 		RemoveSpecificFriend      func(childComplexity int, friendID string) int
 		RequestJoinGroup          func(childComplexity int, groupID string) int
 		SendChangePassword        func(childComplexity int, email string) int
@@ -167,6 +168,7 @@ type ComplexityRoot struct {
 
 	Notification struct {
 		CreatedAt func(childComplexity int) int
+		FromUser  func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Read      func(childComplexity int) int
 		Text      func(childComplexity int) int
@@ -204,6 +206,7 @@ type ComplexityRoot struct {
 		GetComment          func(childComplexity int, id string) int
 		GetGroup            func(childComplexity int, groupID string) int
 		GetGroupPost        func(childComplexity int, groupID string) int
+		GetNonMemberUser    func(childComplexity int, groupID string) int
 		GetPost             func(childComplexity int, id string) int
 		GetReel             func(childComplexity int, reelID string) int
 		GetUser             func(childComplexity int, id string) int
@@ -257,7 +260,6 @@ type ComplexityRoot struct {
 		GroupInvite     func(childComplexity int) int
 		ID              func(childComplexity int) int
 		LastName        func(childComplexity int) int
-		Notification    func(childComplexity int) int
 		PendingFriend   func(childComplexity int) int
 		ProfileImageURL func(childComplexity int) int
 		SpecificFriend  func(childComplexity int) int
@@ -284,8 +286,6 @@ type CommentResolver interface {
 }
 type GroupResolver interface {
 	User(ctx context.Context, obj *model.Group) ([]*model.User, error)
-
-	GroupFile(ctx context.Context, obj *model.Group) ([]*model.GroupFile, error)
 }
 type GroupFileResolver interface {
 	User(ctx context.Context, obj *model.GroupFile) (*model.User, error)
@@ -318,12 +318,14 @@ type MutationResolver interface {
 	CreateGroup(ctx context.Context, inputGroup model.NewGroup) (*model.Group, error)
 	PromoteMember(ctx context.Context, groupID string, userID string) (bool, error)
 	ApproveRequest(ctx context.Context, groupID string, userID string) (bool, error)
+	RejectRequest(ctx context.Context, groupID string, userID string) (bool, error)
 	KickMember(ctx context.Context, groupID string, userID string) (bool, error)
 	EditGroupBanner(ctx context.Context, groupID string, fileURL string) (bool, error)
 	DeleteGroupFile(ctx context.Context, groupID string, fileID string) (bool, error)
 	InviteFriend(ctx context.Context, groupID string, userID string) (bool, error)
 	RequestJoinGroup(ctx context.Context, groupID string) (bool, error)
 	LeaveGroup(ctx context.Context, groupID string) (bool, error)
+	CheckMember(ctx context.Context, groupID string) (bool, error)
 	CreateNotification(ctx context.Context, inputNotification *model.NewNotification) (bool, error)
 	DeleteNotification(ctx context.Context, notificationID string) (bool, error)
 	ReadNotification(ctx context.Context, notificationID string) (bool, error)
@@ -367,6 +369,7 @@ type QueryResolver interface {
 	GetAllGroupFile(ctx context.Context, groupID string) ([]*model.GroupFile, error)
 	CheckAdminUser(ctx context.Context, groupID string) (bool, error)
 	GetAllGroupUser(ctx context.Context, groupID string) ([]*model.GroupUser, error)
+	GetNonMemberUser(ctx context.Context, groupID string) ([]*model.User, error)
 	GetAllNotification(ctx context.Context) ([]*model.Notification, error)
 	GetUserNotification(ctx context.Context) ([]*model.Notification, error)
 	GetAllPost(ctx context.Context) ([]*model.Post, error)
@@ -397,7 +400,6 @@ type SubscriptionResolver interface {
 	GetChat(ctx context.Context, chatRoomID string) (<-chan []*model.Chat, error)
 }
 type UserResolver interface {
-	Notification(ctx context.Context, obj *model.User) ([]*model.Notification, error)
 	GroupInvite(ctx context.Context, obj *model.User) ([]*model.Group, error)
 }
 
@@ -548,13 +550,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Group.CreatedAt(childComplexity), true
-
-	case "Group.groupFile":
-		if e.complexity.Group.GroupFile == nil {
-			break
-		}
-
-		return e.complexity.Group.GroupFile(childComplexity), true
 
 	case "Group.id":
 		if e.complexity.Group.ID == nil {
@@ -723,6 +718,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ChangePassword(childComplexity, args["email"].(string), args["newPassword"].(string)), true
+
+	case "Mutation.checkMember":
+		if e.complexity.Mutation.CheckMember == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_checkMember_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CheckMember(childComplexity, args["groupID"].(string)), true
 
 	case "Mutation.createChat":
 		if e.complexity.Mutation.CreateChat == nil {
@@ -1084,6 +1091,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RejectGroupInvite(childComplexity, args["groupID"].(string)), true
 
+	case "Mutation.rejectRequest":
+		if e.complexity.Mutation.RejectRequest == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_rejectRequest_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RejectRequest(childComplexity, args["groupID"].(string), args["userID"].(string)), true
+
 	case "Mutation.removeSpecificFriend":
 		if e.complexity.Mutation.RemoveSpecificFriend == nil {
 			break
@@ -1258,6 +1277,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Notification.CreatedAt(childComplexity), true
+
+	case "Notification.fromUser":
+		if e.complexity.Notification.FromUser == nil {
+			break
+		}
+
+		return e.complexity.Notification.FromUser(childComplexity), true
 
 	case "Notification.id":
 		if e.complexity.Notification.ID == nil {
@@ -1515,6 +1541,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetGroupPost(childComplexity, args["groupID"].(string)), true
+
+	case "Query.getNonMemberUser":
+		if e.complexity.Query.GetNonMemberUser == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getNonMemberUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetNonMemberUser(childComplexity, args["groupID"].(string)), true
 
 	case "Query.getPost":
 		if e.complexity.Query.GetPost == nil {
@@ -1811,13 +1849,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.LastName(childComplexity), true
-
-	case "User.notification":
-		if e.complexity.User.Notification == nil {
-			break
-		}
-
-		return e.complexity.User.Notification(childComplexity), true
 
 	case "User.pendingFriend":
 		if e.complexity.User.PendingFriend == nil {
@@ -2136,6 +2167,21 @@ func (ec *executionContext) field_Mutation_changePassword_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_checkMember_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["groupID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupID"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["groupID"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createChatRoom_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2319,7 +2365,7 @@ func (ec *executionContext) field_Mutation_deleteGroupFile_args(ctx context.Cont
 	var arg1 string
 	if tmp, ok := rawArgs["fileID"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fileID"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		arg1, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2646,6 +2692,30 @@ func (ec *executionContext) field_Mutation_rejectGroupInvite_args(ctx context.Co
 		}
 	}
 	args["groupID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_rejectRequest_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["groupID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupID"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["groupID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["userID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+		arg1, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userID"] = arg1
 	return args, nil
 }
 
@@ -3030,6 +3100,21 @@ func (ec *executionContext) field_Query_getGroup_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getNonMemberUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["groupID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupID"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["groupID"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_getPost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3393,8 +3478,6 @@ func (ec *executionContext) fieldContext_Chat_user(ctx context.Context, field gr
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -3510,8 +3593,6 @@ func (ec *executionContext) fieldContext_ChatRoom_user(ctx context.Context, fiel
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -3664,8 +3745,6 @@ func (ec *executionContext) fieldContext_ChatRoom_group(ctx context.Context, fie
 				return ec.fieldContext_Group_user(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Group_createdAt(ctx, field)
-			case "groupFile":
-				return ec.fieldContext_Group_groupFile(ctx, field)
 			case "pendingUser":
 				return ec.fieldContext_Group_pendingUser(ctx, field)
 			}
@@ -3872,8 +3951,6 @@ func (ec *executionContext) fieldContext_Comment_user(ctx context.Context, field
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -4043,8 +4120,6 @@ func (ec *executionContext) fieldContext_Comment_likedBy(ctx context.Context, fi
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -4245,8 +4320,6 @@ func (ec *executionContext) fieldContext_Group_user(ctx context.Context, field g
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -4295,61 +4368,6 @@ func (ec *executionContext) fieldContext_Group_createdAt(ctx context.Context, fi
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Group_groupFile(ctx context.Context, field graphql.CollectedField, obj *model.Group) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Group_groupFile(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Group().GroupFile(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.GroupFile)
-	fc.Result = res
-	return ec.marshalOGroupFile2ᚕᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐGroupFileᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Group_groupFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Group",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_GroupFile_id(ctx, field)
-			case "user":
-				return ec.fieldContext_GroupFile_user(ctx, field)
-			case "fileURL":
-				return ec.fieldContext_GroupFile_fileURL(ctx, field)
-			case "fileName":
-				return ec.fieldContext_GroupFile_fileName(ctx, field)
-			case "type":
-				return ec.fieldContext_GroupFile_type(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_GroupFile_createdAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type GroupFile", field.Name)
 		},
 	}
 	return fc, nil
@@ -4417,8 +4435,6 @@ func (ec *executionContext) fieldContext_Group_pendingUser(ctx context.Context, 
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -4537,8 +4553,6 @@ func (ec *executionContext) fieldContext_GroupFile_user(ctx context.Context, fie
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -4789,8 +4803,6 @@ func (ec *executionContext) fieldContext_GroupUser_user(ctx context.Context, fie
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -4909,8 +4921,6 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -5216,8 +5226,6 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -5303,8 +5311,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -6186,8 +6192,6 @@ func (ec *executionContext) fieldContext_Mutation_createGroup(ctx context.Contex
 				return ec.fieldContext_Group_user(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Group_createdAt(ctx, field)
-			case "groupFile":
-				return ec.fieldContext_Group_groupFile(ctx, field)
 			case "pendingUser":
 				return ec.fieldContext_Group_pendingUser(ctx, field)
 			}
@@ -6312,6 +6316,61 @@ func (ec *executionContext) fieldContext_Mutation_approveRequest(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_approveRequest_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_rejectRequest(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_rejectRequest(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RejectRequest(rctx, fc.Args["groupID"].(string), fc.Args["userID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_rejectRequest(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_rejectRequest_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6642,6 +6701,61 @@ func (ec *executionContext) fieldContext_Mutation_leaveGroup(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_leaveGroup_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_checkMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_checkMember(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CheckMember(rctx, fc.Args["groupID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_checkMember(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_checkMember_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8116,8 +8230,6 @@ func (ec *executionContext) fieldContext_Notification_user(ctx context.Context, 
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -8254,6 +8366,80 @@ func (ec *executionContext) fieldContext_Notification_read(ctx context.Context, 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Notification_fromUser(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Notification_fromUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FromUser, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Notification_fromUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Notification",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "first_name":
+				return ec.fieldContext_User_first_name(ctx, field)
+			case "last_name":
+				return ec.fieldContext_User_last_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "gender":
+				return ec.fieldContext_User_gender(ctx, field)
+			case "dob":
+				return ec.fieldContext_User_dob(ctx, field)
+			case "activated":
+				return ec.fieldContext_User_activated(ctx, field)
+			case "profileImageURL":
+				return ec.fieldContext_User_profileImageURL(ctx, field)
+			case "bannerImageURL":
+				return ec.fieldContext_User_bannerImageURL(ctx, field)
+			case "friend":
+				return ec.fieldContext_User_friend(ctx, field)
+			case "pendingFriend":
+				return ec.fieldContext_User_pendingFriend(ctx, field)
+			case "blockedUser":
+				return ec.fieldContext_User_blockedUser(ctx, field)
+			case "specificFriend":
+				return ec.fieldContext_User_specificFriend(ctx, field)
+			case "groupInvite":
+				return ec.fieldContext_User_groupInvite(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -8453,8 +8639,6 @@ func (ec *executionContext) fieldContext_Post_user(ctx context.Context, field gr
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -8526,8 +8710,6 @@ func (ec *executionContext) fieldContext_Post_likedBy(ctx context.Context, field
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -8656,8 +8838,6 @@ func (ec *executionContext) fieldContext_Post_sharedBy(ctx context.Context, fiel
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -8729,8 +8909,6 @@ func (ec *executionContext) fieldContext_Post_tagged(ctx context.Context, field 
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -8874,8 +9052,6 @@ func (ec *executionContext) fieldContext_Post_group(ctx context.Context, field g
 				return ec.fieldContext_Group_user(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Group_createdAt(ctx, field)
-			case "groupFile":
-				return ec.fieldContext_Group_groupFile(ctx, field)
 			case "pendingUser":
 				return ec.fieldContext_Group_pendingUser(ctx, field)
 			}
@@ -8950,8 +9126,6 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -9037,8 +9211,6 @@ func (ec *executionContext) fieldContext_Query_getAllUser(ctx context.Context, f
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -9113,8 +9285,6 @@ func (ec *executionContext) fieldContext_Query_getAllNonFriend(ctx context.Conte
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -9301,8 +9471,6 @@ func (ec *executionContext) fieldContext_Query_getAllUserGroup(ctx context.Conte
 				return ec.fieldContext_Group_user(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Group_createdAt(ctx, field)
-			case "groupFile":
-				return ec.fieldContext_Group_groupFile(ctx, field)
 			case "pendingUser":
 				return ec.fieldContext_Group_pendingUser(ctx, field)
 			}
@@ -9361,8 +9529,6 @@ func (ec *executionContext) fieldContext_Query_getGroup(ctx context.Context, fie
 				return ec.fieldContext_Group_user(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Group_createdAt(ctx, field)
-			case "groupFile":
-				return ec.fieldContext_Group_groupFile(ctx, field)
 			case "pendingUser":
 				return ec.fieldContext_Group_pendingUser(ctx, field)
 			}
@@ -9562,6 +9728,88 @@ func (ec *executionContext) fieldContext_Query_getAllGroupUser(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getNonMemberUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getNonMemberUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetNonMemberUser(rctx, fc.Args["groupID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚕᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getNonMemberUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "first_name":
+				return ec.fieldContext_User_first_name(ctx, field)
+			case "last_name":
+				return ec.fieldContext_User_last_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "gender":
+				return ec.fieldContext_User_gender(ctx, field)
+			case "dob":
+				return ec.fieldContext_User_dob(ctx, field)
+			case "activated":
+				return ec.fieldContext_User_activated(ctx, field)
+			case "profileImageURL":
+				return ec.fieldContext_User_profileImageURL(ctx, field)
+			case "bannerImageURL":
+				return ec.fieldContext_User_bannerImageURL(ctx, field)
+			case "friend":
+				return ec.fieldContext_User_friend(ctx, field)
+			case "pendingFriend":
+				return ec.fieldContext_User_pendingFriend(ctx, field)
+			case "blockedUser":
+				return ec.fieldContext_User_blockedUser(ctx, field)
+			case "specificFriend":
+				return ec.fieldContext_User_specificFriend(ctx, field)
+			case "groupInvite":
+				return ec.fieldContext_User_groupInvite(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getNonMemberUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getAllNotification(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getAllNotification(ctx, field)
 	if err != nil {
@@ -9611,6 +9859,8 @@ func (ec *executionContext) fieldContext_Query_getAllNotification(ctx context.Co
 				return ec.fieldContext_Notification_text(ctx, field)
 			case "read":
 				return ec.fieldContext_Notification_read(ctx, field)
+			case "fromUser":
+				return ec.fieldContext_Notification_fromUser(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Notification", field.Name)
 		},
@@ -9667,6 +9917,8 @@ func (ec *executionContext) fieldContext_Query_getUserNotification(ctx context.C
 				return ec.fieldContext_Notification_text(ctx, field)
 			case "read":
 				return ec.fieldContext_Notification_read(ctx, field)
+			case "fromUser":
+				return ec.fieldContext_Notification_fromUser(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Notification", field.Name)
 		},
@@ -10777,8 +11029,6 @@ func (ec *executionContext) fieldContext_Reel_user(ctx context.Context, field gr
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -10850,8 +11100,6 @@ func (ec *executionContext) fieldContext_Reel_likedBy(ctx context.Context, field
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -10980,8 +11228,6 @@ func (ec *executionContext) fieldContext_Reel_sharedBy(ctx context.Context, fiel
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -11232,8 +11478,6 @@ func (ec *executionContext) fieldContext_ReelComment_user(ctx context.Context, f
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -11403,8 +11647,6 @@ func (ec *executionContext) fieldContext_ReelComment_likedBy(ctx context.Context
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -11611,8 +11853,6 @@ func (ec *executionContext) fieldContext_Story_user(ctx context.Context, field g
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -12152,8 +12392,6 @@ func (ec *executionContext) fieldContext_User_friend(ctx context.Context, field 
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -12225,8 +12463,6 @@ func (ec *executionContext) fieldContext_User_pendingFriend(ctx context.Context,
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -12298,8 +12534,6 @@ func (ec *executionContext) fieldContext_User_blockedUser(ctx context.Context, f
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -12371,65 +12605,10 @@ func (ec *executionContext) fieldContext_User_specificFriend(ctx context.Context
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _User_notification(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_notification(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Notification(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Notification)
-	fc.Result = res
-	return ec.marshalONotification2ᚕᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐNotificationᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_notification(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Notification_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Notification_user(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Notification_createdAt(ctx, field)
-			case "text":
-				return ec.fieldContext_Notification_text(ctx, field)
-			case "read":
-				return ec.fieldContext_Notification_read(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Notification", field.Name)
 		},
 	}
 	return fc, nil
@@ -12481,8 +12660,6 @@ func (ec *executionContext) fieldContext_User_groupInvite(ctx context.Context, f
 				return ec.fieldContext_Group_user(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Group_createdAt(ctx, field)
-			case "groupFile":
-				return ec.fieldContext_Group_groupFile(ctx, field)
 			case "pendingUser":
 				return ec.fieldContext_Group_pendingUser(ctx, field)
 			}
@@ -12557,8 +12734,6 @@ func (ec *executionContext) fieldContext_UserAuthorization_user(ctx context.Cont
 				return ec.fieldContext_User_blockedUser(ctx, field)
 			case "specificFriend":
 				return ec.fieldContext_User_specificFriend(ctx, field)
-			case "notification":
-				return ec.fieldContext_User_notification(ctx, field)
 			case "groupInvite":
 				return ec.fieldContext_User_groupInvite(ctx, field)
 			}
@@ -15331,39 +15506,6 @@ func (ec *executionContext) _Group(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "groupFile":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Group_groupFile(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "pendingUser":
 			out.Values[i] = ec._Group_pendingUser(ctx, field, obj)
 		default:
@@ -15746,6 +15888,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "rejectRequest":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_rejectRequest(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "kickMember":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_kickMember(ctx, field)
@@ -15784,6 +15933,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "leaveGroup":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_leaveGroup(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "checkMember":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_checkMember(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -16022,6 +16178,11 @@ func (ec *executionContext) _Notification(ctx context.Context, sel ast.Selection
 			}
 		case "read":
 			out.Values[i] = ec._Notification_read(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fromUser":
+			out.Values[i] = ec._Notification_fromUser(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -16430,6 +16591,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getAllGroupUser(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getNonMemberUser":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getNonMemberUser(ctx, field)
 				return res
 			}
 
@@ -17165,39 +17345,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_blockedUser(ctx, field, obj)
 		case "specificFriend":
 			out.Values[i] = ec._User_specificFriend(ctx, field, obj)
-		case "notification":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._User_notification(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "groupInvite":
 			field := field
 
@@ -18715,53 +18862,6 @@ func (ec *executionContext) unmarshalONewNotification2ᚖgithubᚗcomᚋobertcoy
 	}
 	res, err := ec.unmarshalInputNewNotification(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalONotification2ᚕᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐNotificationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Notification) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNNotification2ᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐNotification(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalOPost2ᚕᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Post) graphql.Marshaler {

@@ -46,3 +46,23 @@ func GetChatRoom(ctx context.Context, id string) (*model.ChatRoom, error) {
 	}).Preload("Group").First(&room).Error
 	return room, err
 }
+
+func AddUserToGroupChat(ctx context.Context, userID, groupID string) (bool, error){
+	
+	user, err := GetUser(ctx, userID)
+
+	if err != nil {
+		return false, nil
+	}
+
+	var usersID []string 
+	usersID = append(usersID, userID)
+	room, err := GetChatRoomByUser(ctx, usersID, &groupID)
+	
+	if err != nil {
+		return false, err
+	}
+	
+	room.User = append(room.User, user)
+	return true, db.Save(&room).Error
+}
