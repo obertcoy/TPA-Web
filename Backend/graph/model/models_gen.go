@@ -38,6 +38,7 @@ type NewGroup struct {
 }
 
 type NewGroupFile struct {
+	GroupID  string `json:"groupID"`
 	FileURL  string `json:"fileURL"`
 	FileName string `json:"fileName"`
 	Type     string `json:"type"`

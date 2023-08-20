@@ -163,6 +163,7 @@ type ComplexityRoot struct {
 		UpdateBannerImage         func(childComplexity int, fileURL string) int
 		UpdateProfileImage        func(childComplexity int, fileURL string) int
 		UpdateUser                func(childComplexity int, id string, inputUser model.NewUser) int
+		UploadGroupFile           func(childComplexity int, inputGroupFile model.NewGroupFile) int
 		VerifyChangePasswordToken func(childComplexity int, email string, token string) int
 	}
 
@@ -315,6 +316,7 @@ type MutationResolver interface {
 	CreateChatRoom(ctx context.Context, inputChatRoom model.NewChatRoom) (*model.ChatRoom, error)
 	GoToChatRoom(ctx context.Context, inputChatRoom model.NewChatRoom) (*model.ChatRoom, error)
 	CreateChat(ctx context.Context, inputChat model.NewChat) (*model.Chat, error)
+	UploadGroupFile(ctx context.Context, inputGroupFile model.NewGroupFile) (*model.GroupFile, error)
 	CreateGroup(ctx context.Context, inputGroup model.NewGroup) (*model.Group, error)
 	PromoteMember(ctx context.Context, groupID string, userID string) (bool, error)
 	ApproveRequest(ctx context.Context, groupID string, userID string) (bool, error)
@@ -1258,6 +1260,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["inputUser"].(model.NewUser)), true
+
+	case "Mutation.uploadGroupFile":
+		if e.complexity.Mutation.UploadGroupFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_uploadGroupFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UploadGroupFile(childComplexity, args["inputGroupFile"].(model.NewGroupFile)), true
 
 	case "Mutation.verifyChangePasswordToken":
 		if e.complexity.Mutation.VerifyChangePasswordToken == nil {
@@ -2938,6 +2952,21 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 		}
 	}
 	args["inputUser"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadGroupFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewGroupFile
+	if tmp, ok := rawArgs["inputGroupFile"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inputGroupFile"))
+		arg0, err = ec.unmarshalNNewGroupFile2githubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐNewGroupFile(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["inputGroupFile"] = arg0
 	return args, nil
 }
 
@@ -6137,6 +6166,75 @@ func (ec *executionContext) fieldContext_Mutation_createChat(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createChat_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_uploadGroupFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_uploadGroupFile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UploadGroupFile(rctx, fc.Args["inputGroupFile"].(model.NewGroupFile))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.GroupFile)
+	fc.Result = res
+	return ec.marshalNGroupFile2ᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐGroupFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_uploadGroupFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_GroupFile_id(ctx, field)
+			case "user":
+				return ec.fieldContext_GroupFile_user(ctx, field)
+			case "fileURL":
+				return ec.fieldContext_GroupFile_fileURL(ctx, field)
+			case "fileName":
+				return ec.fieldContext_GroupFile_fileName(ctx, field)
+			case "type":
+				return ec.fieldContext_GroupFile_type(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_GroupFile_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GroupFile", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_uploadGroupFile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -14766,13 +14864,22 @@ func (ec *executionContext) unmarshalInputNewGroupFile(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"fileURL", "fileName", "type"}
+	fieldsInOrder := [...]string{"groupID", "fileURL", "fileName", "type"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "groupID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupID"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GroupID = data
 		case "fileURL":
 			var err error
 
@@ -15863,6 +15970,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createChat":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createChat(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "uploadGroupFile":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_uploadGroupFile(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -17842,6 +17956,10 @@ func (ec *executionContext) marshalNGroup2ᚖgithubᚗcomᚋobertcoyᚋtpaᚑweb
 	return ec._Group(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNGroupFile2githubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐGroupFile(ctx context.Context, sel ast.SelectionSet, v model.GroupFile) graphql.Marshaler {
+	return ec._GroupFile(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNGroupFile2ᚖgithubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐGroupFile(ctx context.Context, sel ast.SelectionSet, v *model.GroupFile) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -17899,6 +18017,11 @@ func (ec *executionContext) unmarshalNNewComment2githubᚗcomᚋobertcoyᚋtpa�
 
 func (ec *executionContext) unmarshalNNewGroup2githubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐNewGroup(ctx context.Context, v interface{}) (model.NewGroup, error) {
 	res, err := ec.unmarshalInputNewGroup(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewGroupFile2githubᚗcomᚋobertcoyᚋtpaᚑwebᚋgraphᚋmodelᚐNewGroupFile(ctx context.Context, v interface{}) (model.NewGroupFile, error) {
+	res, err := ec.unmarshalInputNewGroupFile(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

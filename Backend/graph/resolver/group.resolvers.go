@@ -21,12 +21,44 @@ func (r *groupResolver) User(ctx context.Context, obj *model.Group) ([]*model.Us
 
 // User is the resolver for the user field.
 func (r *groupFileResolver) User(ctx context.Context, obj *model.GroupFile) (*model.User, error) {
-	return obj.User, nil
+	return service.GetUser(ctx, obj.UserID)
 }
 
 // User is the resolver for the user field.
 func (r *groupUserResolver) User(ctx context.Context, obj *model.GroupUser) (*model.User, error) {
 	return obj.User, nil
+}
+
+// UploadGroupFile is the resolver for the uploadGroupFile field.
+func (r *mutationResolver) UploadGroupFile(ctx context.Context, inputGroupFile model.NewGroupFile) (*model.GroupFile, error) {
+	
+	userID := ctx.Value("TokenHeader").(string)
+
+	group, err := service.GetGroup(ctx, inputGroupFile.GroupID)
+	if err != nil {
+		return nil, err
+	}
+
+	file := &model.GroupFile{
+		ID:        uuid.NewString(),
+		UserID:    userID,
+		FileURL:   inputGroupFile.FileURL,
+		FileName:  inputGroupFile.FileName,
+		Type:      inputGroupFile.Type,
+		CreatedAt: time.Now(),
+	}
+
+	err = r.Database.Save(&file).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Database.Model(&group).Association("GroupFile").Append(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
 
 // CreateGroup is the resolver for the createGroup field.
@@ -86,11 +118,11 @@ func (r *mutationResolver) CreateGroup(ctx context.Context, inputGroup model.New
 func (r *mutationResolver) PromoteMember(ctx context.Context, groupID string, userID string) (bool, error) {
 	userRole := &model.UserGroupRole{
 		UserID:  userID,
-		GroupID: userID,
+		GroupID: groupID,
 		Role:    "Admin",
 	}
 
-	return true, r.Database.Save(&userRole).Error
+	return true, r.Database.Save(userRole).Error
 }
 
 // ApproveRequest is the resolver for the approveRequest field.
@@ -111,7 +143,7 @@ func (r *mutationResolver) ApproveRequest(ctx context.Context, groupID string, u
 
 	userRole := &model.UserGroupRole{
 		UserID:  userID,
-		GroupID: userID,
+		GroupID: groupID,
 		Role:    "Member",
 	}
 
@@ -316,7 +348,7 @@ func (r *queryResolver) GetAllGroupFile(ctx context.Context, groupID string) ([]
 	var files []*model.GroupFile
 	fileSubquery := r.Database.Table("group_groupfiles").Select("group_file_id").Where("group_id = ?", groupID)
 
-	return files, r.Database.Where("id IN (?)", fileSubquery).Find(files).Error
+	return files, r.Database.Where("id IN (?)", fileSubquery).Preload("User").Find(&files).Error
 }
 
 // CheckAdminUser is the resolver for the checkAdminUser field.
@@ -380,4 +412,3 @@ func (r *Resolver) GroupUser() graph.GroupUserResolver { return &groupUserResolv
 type groupResolver struct{ *Resolver }
 type groupFileResolver struct{ *Resolver }
 type groupUserResolver struct{ *Resolver }
-

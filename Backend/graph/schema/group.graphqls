@@ -22,6 +22,7 @@ input NewGroup{
 }
 
 input NewGroupFile{
+    groupID: ID!
     fileURL: String!
     fileName: String!
     type: String!
@@ -45,6 +46,7 @@ extend type Query{
 
 extend type Mutation{
 
+    uploadGroupFile(inputGroupFile: NewGroupFile!): GroupFile!
     createGroup(inputGroup: NewGroup!): Group!
     promoteMember(groupID: ID!, userID: ID!): Boolean!
     approveRequest(groupID: ID!, userID: ID!): Boolean!

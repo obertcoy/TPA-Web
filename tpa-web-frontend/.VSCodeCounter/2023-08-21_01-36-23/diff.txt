@@ -1,0 +1,41 @@
+Date : 2023-08-21 01:36:23
+Directory : c:\TPA\TPA-Web\tpa-web-frontend
+Total : 7 files,  406 codes, 150 comments, 107 blanks, all 663 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| SCSS           |          2 |        259 |          2 |         74 |        335 |
+| TypeScript JSX |          5 |        147 |        148 |         33 |        328 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                            | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                               |          7 |        406 |        150 |        107 |        663 |
+| src                                                                             |          7 |        406 |        150 |        107 |        663 |
+| src\model                                                                       |          1 |         -1 |          0 |          0 |         -1 |
+| src\page                                                                        |          4 |        404 |        150 |        104 |        658 |
+| src\page\component                                                              |          2 |        306 |        150 |         78 |        534 |
+| src\page\component (Files)                                                      |          1 |         91 |        148 |         20 |        259 |
+| src\page\component\css                                                          |          1 |        215 |          2 |         58 |        275 |
+| src\page\css                                                                    |          1 |         44 |          0 |         16 |         60 |
+| src\page\main                                                                   |          1 |         54 |          0 |         10 |         64 |
+| src\query                                                                       |          2 |          3 |          0 |          3 |          6 |
++---------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                        | language       | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\GroupModel.tsx                        | TypeScript JSX |         -1 |          0 |          0 |         -1 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\GroupProfile.tsx             | TypeScript JSX |         91 |        148 |         20 |        259 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\GroupProfile.module.scss | SCSS           |        215 |          2 |         58 |        275 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\NotificicationPage.module.scss     | SCSS           |         44 |          0 |         16 |         60 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\NotificationsPage.tsx             | TypeScript JSX |         54 |          0 |         10 |         64 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\GroupQuery.tsx                        | TypeScript JSX |        -12 |          0 |          1 |        -11 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\UserQuery.tsx                         | TypeScript JSX |         15 |          0 |          2 |         17 |
+| Total                                                                           |                |        406 |        150 |        107 |        663 |
++---------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

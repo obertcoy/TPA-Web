@@ -1,0 +1,9 @@
+"filename", "language", "TypeScript JSX", "SCSS", "comment", "blank", "total"
+"c:\TPA\TPA-Web\tpa-web-frontend\src\model\GroupModel.tsx", "TypeScript JSX", -1, 0, 0, 0, -1
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\GroupProfile.tsx", "TypeScript JSX", 91, 0, 148, 20, 259
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\GroupProfile.module.scss", "SCSS", 0, 215, 2, 58, 275
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\NotificicationPage.module.scss", "SCSS", 0, 44, 0, 16, 60
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\NotificationsPage.tsx", "TypeScript JSX", 54, 0, 0, 10, 64
+"c:\TPA\TPA-Web\tpa-web-frontend\src\query\GroupQuery.tsx", "TypeScript JSX", -12, 0, 0, 1, -11
+"c:\TPA\TPA-Web\tpa-web-frontend\src\query\UserQuery.tsx", "TypeScript JSX", 15, 0, 0, 2, 17
+"Total", "-", 147, 259, 150, 107, 663

@@ -179,3 +179,20 @@ mutation CheckMember($groupID: ID!){
   checkMember(groupID: $groupID)
 }
 `
+export const UPLOAD_GROUP_FILE = gql`
+mutation UploadGroupFile($inputGroupFile: NewGroupFile!){
+  uploadGroupFile(inputGroupFile: $inputGroupFile){
+    id
+    user{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    fileURL
+    fileName
+    type
+    createdAt
+  }
+}
+`
