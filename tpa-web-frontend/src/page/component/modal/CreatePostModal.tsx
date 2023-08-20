@@ -18,6 +18,9 @@ import { GET_USER } from '../../../query/UserQuery'
 import EditorText from '../EditorText'
 import { GET_ALL_USER_GROUP } from '../../../query/GroupQuery'
 import { Group } from '../../../model/GroupModel'
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify'
+
 
 interface CreatePostModalProps {
     handleOpenCreatePost: () => void
@@ -114,9 +117,19 @@ export default function CreatePostModal({ handleOpenCreatePost, refetchGetAllPos
 
             for (const file of Array.from(files)) {
                 const fileRef = ref(firebaseStorage, `temps/${v4()}${file.name}`);
-                const snapshot = await uploadBytes(fileRef, file);
-                const url = await getDownloadURL(snapshot.ref);
-                setFilesURL((prev) => [...prev, url]);
+
+                toast.promise(
+                    uploadBytes(fileRef, file),
+                    {
+                        pending: 'Uploading file...',
+                        success: 'File uploaded!',
+                        error: 'File upload failed',
+                    }
+                ).then(async (snapshot) => {
+
+                    const url = await getDownloadURL(snapshot.ref);
+                    setFilesURL((prev) => [...prev, url]);
+                })
             }
         }
     };
@@ -125,7 +138,11 @@ export default function CreatePostModal({ handleOpenCreatePost, refetchGetAllPos
     const handleCreatePost = async () => {
         if (text != '' && postType != '') {
 
-            await moveFilesToUploads()
+            await toast.promise(moveFilesToUploads(), {
+                pending: 'Uploading file...',
+                success: 'File uploaded!',
+                error: 'File upload failed',
+            })
 
             if (taggedUser.length > 0) {
 
@@ -263,8 +280,17 @@ export default function CreatePostModal({ handleOpenCreatePost, refetchGetAllPos
                             <button id={style['post-button']} onClick={handleCreatePost}>Post</button>
                         </div>
                     </div>
-
             }
+            <ToastContainer position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored" />
         </div>
     )
 }

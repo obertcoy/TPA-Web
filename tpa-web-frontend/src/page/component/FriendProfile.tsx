@@ -119,7 +119,7 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
 
     return (
         <>
-            {openCreatePost && <CreatePostModal handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} />}
+            {openCreatePost && <CreatePostModal handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} initialGroup={null}/>}
             {openPostModal && postModalID && <PostModal postID={postModalID} handleClosePostModal={handleClosePostModal} />}
 
             <div className={style['page-container']}>
@@ -291,7 +291,7 @@ interface NonFriendCardProps {
     toUserProfile: (userID: string) => void
 }
 
-function NonFriendCard({ data, userPageData, toUserProfile }: NonFriendCardProps) {
+export function NonFriendCard({ data, userPageData, toUserProfile }: NonFriendCardProps) {
 
     const [sendFriendRequest] = useMutation(SEND_FRIEND_REQUEST, {
         variables: {

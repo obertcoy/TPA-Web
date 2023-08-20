@@ -1,0 +1,64 @@
+"filename", "language", "JSON", "TypeScript", "TypeScript JSX", "SCSS", "CSS", "comment", "blank", "total"
+"c:\TPA\TPA-Web\tpa-web-frontend\package-lock.json", "JSON", 336, 0, 0, 0, 0, 0, 0, 336
+"c:\TPA\TPA-Web\tpa-web-frontend\package.json", "JSON", 12, 0, 0, 0, 0, 0, 0, 12
+"c:\TPA\TPA-Web\tpa-web-frontend\src\App.tsx", "TypeScript JSX", 0, 0, 6, 0, 0, 5, 0, 11
+"c:\TPA\TPA-Web\tpa-web-frontend\src\helper\TextHelper.tsx", "TypeScript JSX", 0, 0, 39, 0, 0, 0, 12, 51
+"c:\TPA\TPA-Web\tpa-web-frontend\src\helper\UserHelper.tsx", "TypeScript JSX", 0, 0, 4, 0, 0, 0, 1, 5
+"c:\TPA\TPA-Web\tpa-web-frontend\src\index.css", "CSS", 0, 0, 0, 0, 3, 0, 2, 5
+"c:\TPA\TPA-Web\tpa-web-frontend\src\model\ChatModel.tsx", "TypeScript JSX", 0, 0, 16, 0, 0, 0, 4, 20
+"c:\TPA\TPA-Web\tpa-web-frontend\src\model\GroupModel.tsx", "TypeScript JSX", 0, 0, 27, 0, 0, 0, 4, 31
+"c:\TPA\TPA-Web\tpa-web-frontend\src\model\NotificationModel.tsx", "TypeScript JSX", 0, 0, 9, 0, 0, 0, 1, 10
+"c:\TPA\TPA-Web\tpa-web-frontend\src\model\PostModel.tsx", "TypeScript JSX", 0, 0, 2, 0, 0, 0, 0, 2
+"c:\TPA\TPA-Web\tpa-web-frontend\src\model\UserModel.tsx", "TypeScript JSX", 0, 0, 3, 0, 0, 0, 1, 4
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\ChatRoomComponent.tsx", "TypeScript JSX", 0, 0, 100, 0, 0, 0, 18, 118
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\EditorText.tsx", "TypeScript JSX", 0, 0, 59, 0, 0, 1, 13, 73
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\FriendProfile.tsx", "TypeScript JSX", 0, 0, 272, 0, 0, 2, 51, 325
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\FriendsNavbar.tsx", "TypeScript JSX", 0, 0, 81, 0, 0, 0, 18, 99
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\GroupProfile.tsx", "TypeScript JSX", 0, 0, 140, 0, 0, 191, 36, 367
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\MasterLayout.tsx", "TypeScript JSX", 0, 0, 1, 0, 0, 0, 0, 1
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\MentionComponent.tsx", "TypeScript JSX", 0, 0, 85, 0, 0, 0, 21, 106
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\Navbar.tsx", "TypeScript JSX", 0, 0, 123, 0, 0, 0, 16, 139
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\ReelNavbar.tsx", "TypeScript JSX", 0, 0, -45, 0, 0, 0, -13, -58
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\CommentCard.tsx", "TypeScript JSX", 0, 0, 6, 0, 0, 2, -1, 7
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\PostCard.tsx", "TypeScript JSX", 0, 0, 37, 0, 0, 0, 5, 42
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\ReplyCard.tsx", "TypeScript JSX", 0, 0, 7, 0, 0, 2, -1, 8
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\UserChat.tsx", "TypeScript JSX", 0, 0, 52, 0, 0, 0, 9, 61
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\CommentCard.module.scss", "SCSS", 0, 0, 0, 8, 0, 1, -1, 8
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\PostCard.module.scss", "SCSS", 0, 0, 0, 2, 0, 0, 2, 4
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\ReplyCard.module.scss", "SCSS", 0, 0, 0, 8, 0, 3, 0, 11
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\UserChat.module.scss", "SCSS", 0, 0, 0, 61, 0, 0, 20, 81
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\ChatRoomComponent.module.scss", "SCSS", 0, 0, 0, 117, 0, 4, 33, 154
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\EditorText.module.scss", "SCSS", 0, 0, 0, 16, 0, 3, 3, 22
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\FriendProfile.module.scss", "SCSS", 0, 0, 0, 445, 0, 1, 131, 577
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\FriendsNavbar.module.scss", "SCSS", 0, 0, 0, 112, 0, 0, 36, 148
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\GroupProfile.module.scss", "SCSS", 0, 0, 0, 420, 0, 1, 120, 541
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\Navbar.module.scss", "SCSS", 0, 0, 0, 178, 0, 0, 50, 228
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\ReelNavbar.module.scss", "SCSS", 0, 0, 0, -86, 0, 0, -28, -114
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\CreateGroupModal.tsx", "TypeScript JSX", 0, 0, 67, 0, 0, 1, 12, 80
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\CreatePostModal.tsx", "TypeScript JSX", 0, 0, 163, 0, 0, 1, 21, 185
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\InviteGroupModal.tsx", "TypeScript JSX", 0, 0, 112, 0, 0, 0, 14, 126
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\PostModal.tsx", "TypeScript JSX", 0, 0, 19, 0, 0, 1, 4, 24
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\css\CreateGroupModal.module.scss", "SCSS", 0, 0, 0, 243, 0, 0, 67, 310
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\css\CreatePostModal.module.scss", "SCSS", 0, 0, 0, 147, 0, 0, 36, 183
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\css\InviteGroupModal.module.scss", "SCSS", 0, 0, 0, 145, 0, 0, 35, 180
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\ChatsPage.module.scss", "SCSS", 0, 0, 0, 112, 0, 2, 34, 148
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\FriendsPage.module.scss", "SCSS", 0, 0, 0, 118, 0, 0, 41, 159
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\GroupsPage.module.scss", "SCSS", 0, 0, 0, 114, 0, 0, 35, 149
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\HomePage.module.scss", "SCSS", 0, 0, 0, 4, 0, 0, 1, 5
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\NotificicationPage.module.scss", "SCSS", 0, 0, 0, 77, 0, 0, 18, 95
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\ReelPage.module.scss", "SCSS", 0, 0, 0, 0, 0, 0, 1, 1
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\UserProfilePage.module.scss", "SCSS", 0, 0, 0, 43, 0, 0, 8, 51
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\ChatsPage.tsx", "TypeScript JSX", 0, 0, 102, 0, 0, 0, 18, 120
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\FriendsPage.tsx", "TypeScript JSX", 0, 0, 96, 0, 0, 0, 18, 114
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\GroupsPage.tsx", "TypeScript JSX", 0, 0, 84, 0, 0, 0, 20, 104
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\NotificationsPage.tsx", "TypeScript JSX", 0, 0, 81, 0, 0, 0, 11, 92
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\UserProfilePage.tsx", "TypeScript JSX", 0, 0, 57, 0, 0, 23, 10, 90
+"c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\story\StoryPage.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, -2, -2
+"c:\TPA\TPA-Web\tpa-web-frontend\src\provider\ApolloProvider.tsx", "TypeScript JSX", 0, 0, 24, 0, 0, 0, 2, 26
+"c:\TPA\TPA-Web\tpa-web-frontend\src\query\ChatQuery.tsx", "TypeScript JSX", 0, 0, 119, 0, 0, 0, 5, 124
+"c:\TPA\TPA-Web\tpa-web-frontend\src\query\GroupQuery.tsx", "TypeScript JSX", 0, 0, 194, 0, 0, 0, 15, 209
+"c:\TPA\TPA-Web\tpa-web-frontend\src\query\NotificationQuery.tsx", "TypeScript JSX", 0, 0, 28, 0, 0, 0, 2, 30
+"c:\TPA\TPA-Web\tpa-web-frontend\src\query\PostQuery.tsx", "TypeScript JSX", 0, 0, 125, 0, 0, 0, 3, 128
+"c:\TPA\TPA-Web\tpa-web-frontend\src\query\UserQuery.tsx", "TypeScript JSX", 0, 0, 84, 0, 0, 0, 4, 88
+"c:\TPA\TPA-Web\tpa-web-frontend\vite.config.ts", "TypeScript", 0, 8, 0, 0, 0, 0, -1, 7
+"Total", "-", 348, 8, 2379, 2284, 3, 244, 995, 6261

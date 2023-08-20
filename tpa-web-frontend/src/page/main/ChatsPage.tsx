@@ -74,7 +74,7 @@ export default function ChatsPage() {
                     ?
                     <ChatRoomComponent chatRoomID={chatRoomID} />
                     :
-                    <h3 style={{ color: 'gray', marginTop: '50vh', marginLeft: '40vw' }}>Select a profile</h3>
+                    <h3 style={{ color: 'gray', marginTop: '50vh', marginLeft: '60vw' }}>Select a profile</h3>
                 }
             </div>
 

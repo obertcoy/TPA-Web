@@ -17,6 +17,7 @@ import (
 
 // CreateNotification is the resolver for the createNotification field.
 func (r *mutationResolver) CreateNotification(ctx context.Context, inputNotification *model.NewNotification) (bool, error) {
+	fromUserID := ctx.Value("TokenHeader").(string)
 	user, err := service.GetUser(ctx, inputNotification.UserID)
 
 	if err != nil {
@@ -24,11 +25,12 @@ func (r *mutationResolver) CreateNotification(ctx context.Context, inputNotifica
 	}
 
 	notif := &model.Notification{
-		ID:        uuid.NewString(),
-		Text:      inputNotification.Text,
-		UserID:    user.ID,
-		CreatedAt: time.Now(),
-		Read:      false,
+		ID:         uuid.NewString(),
+		Text:       inputNotification.Text,
+		UserID:     user.ID,
+		CreatedAt:  time.Now(),
+		Read:       false,
+		FromUserID: fromUserID,
 	}
 
 	return true, r.Database.Save(&notif).Error
@@ -72,7 +74,10 @@ func (r *queryResolver) GetAllNotification(ctx context.Context) ([]*model.Notifi
 
 // GetUserNotification is the resolver for the getUserNotification field.
 func (r *queryResolver) GetUserNotification(ctx context.Context) ([]*model.Notification, error) {
-	panic(fmt.Errorf("not implemented: GetUserNotification - getUserNotification"))
+	userID := ctx.Value("TokenHeader").(string)
+	var notifs []*model.Notification
+
+	return notifs, r.Database.Where("user_id = ?", userID).Order("created_at DESC").Preload("FromUser").Find(&notifs).Error
 }
 
 // Notification returns graph.NotificationResolver implementation.

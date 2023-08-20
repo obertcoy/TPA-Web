@@ -1,0 +1,111 @@
+Date : 2023-08-20 15:06:18
+Directory : c:\TPA\TPA-Web\tpa-web-frontend
+Total : 62 files,  5022 codes, 244 comments, 995 blanks, all 6261 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| TypeScript JSX |         37 |      2,379 |        229 |        352 |      2,960 |
+| SCSS           |         21 |      2,284 |         15 |        642 |      2,941 |
+| JSON           |          2 |        348 |          0 |          0 |        348 |
+| TypeScript     |          1 |          8 |          0 |         -1 |          7 |
+| CSS            |          1 |          3 |          0 |          2 |          5 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                      | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                         |         62 |      5,022 |        244 |        995 |      6,261 |
+| . (Files)                                                                                 |          3 |        356 |          0 |         -1 |        355 |
+| src                                                                                       |         59 |      4,666 |        244 |        996 |      5,906 |
+| src (Files)                                                                               |          2 |          9 |          5 |          2 |         16 |
+| src\helper                                                                                |          2 |         43 |          0 |         13 |         56 |
+| src\model                                                                                 |          5 |         57 |          0 |         10 |         67 |
+| src\page                                                                                  |         44 |      3,983 |        239 |        940 |      5,162 |
+| src\page\component                                                                        |         31 |      3,095 |        214 |        727 |      4,036 |
+| src\page\component (Files)                                                                |          9 |        816 |        194 |        160 |      1,170 |
+| src\page\component\card                                                                   |          8 |        181 |          8 |         33 |        222 |
+| src\page\component\card (Files)                                                           |          4 |        102 |          4 |         12 |        118 |
+| src\page\component\card\css                                                               |          4 |         79 |          4 |         21 |        104 |
+| src\page\component\css                                                                    |          7 |      1,202 |          9 |        345 |      1,556 |
+| src\page\component\modal                                                                  |          7 |        896 |          3 |        189 |      1,088 |
+| src\page\component\modal (Files)                                                          |          4 |        361 |          3 |         51 |        415 |
+| src\page\component\modal\css                                                              |          3 |        535 |          0 |        138 |        673 |
+| src\page\css                                                                              |          7 |        468 |          2 |        138 |        608 |
+| src\page\main                                                                             |          6 |        420 |         23 |         75 |        518 |
+| src\page\main (Files)                                                                     |          5 |        420 |         23 |         77 |        520 |
+| src\page\main\story                                                                       |          1 |          0 |          0 |         -2 |         -2 |
+| src\provider                                                                              |          1 |         24 |          0 |          2 |         26 |
+| src\query                                                                                 |          5 |        550 |          0 |         29 |        579 |
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                                  | language       | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| c:\TPA\TPA-Web\tpa-web-frontend\package-lock.json                                         | JSON           |        336 |          0 |          0 |        336 |
+| c:\TPA\TPA-Web\tpa-web-frontend\package.json                                              | JSON           |         12 |          0 |          0 |         12 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\App.tsx                                               | TypeScript JSX |          6 |          5 |          0 |         11 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\helper\TextHelper.tsx                                 | TypeScript JSX |         39 |          0 |         12 |         51 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\helper\UserHelper.tsx                                 | TypeScript JSX |          4 |          0 |          1 |          5 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\index.css                                             | CSS            |          3 |          0 |          2 |          5 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\ChatModel.tsx                                   | TypeScript JSX |         16 |          0 |          4 |         20 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\GroupModel.tsx                                  | TypeScript JSX |         27 |          0 |          4 |         31 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\NotificationModel.tsx                           | TypeScript JSX |          9 |          0 |          1 |         10 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\PostModel.tsx                                   | TypeScript JSX |          2 |          0 |          0 |          2 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\model\UserModel.tsx                                   | TypeScript JSX |          3 |          0 |          1 |          4 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\ChatRoomComponent.tsx                  | TypeScript JSX |        100 |          0 |         18 |        118 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\EditorText.tsx                         | TypeScript JSX |         59 |          1 |         13 |         73 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\FriendProfile.tsx                      | TypeScript JSX |        272 |          2 |         51 |        325 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\FriendsNavbar.tsx                      | TypeScript JSX |         81 |          0 |         18 |         99 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\GroupProfile.tsx                       | TypeScript JSX |        140 |        191 |         36 |        367 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\MasterLayout.tsx                       | TypeScript JSX |          1 |          0 |          0 |          1 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\MentionComponent.tsx                   | TypeScript JSX |         85 |          0 |         21 |        106 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\Navbar.tsx                             | TypeScript JSX |        123 |          0 |         16 |        139 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\ReelNavbar.tsx                         | TypeScript JSX |        -45 |          0 |        -13 |        -58 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\CommentCard.tsx                   | TypeScript JSX |          6 |          2 |         -1 |          7 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\PostCard.tsx                      | TypeScript JSX |         37 |          0 |          5 |         42 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\ReplyCard.tsx                     | TypeScript JSX |          7 |          2 |         -1 |          8 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\UserChat.tsx                      | TypeScript JSX |         52 |          0 |          9 |         61 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\CommentCard.module.scss       | SCSS           |          8 |          1 |         -1 |          8 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\PostCard.module.scss          | SCSS           |          2 |          0 |          2 |          4 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\ReplyCard.module.scss         | SCSS           |          8 |          3 |          0 |         11 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\card\css\UserChat.module.scss          | SCSS           |         61 |          0 |         20 |         81 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\ChatRoomComponent.module.scss      | SCSS           |        117 |          4 |         33 |        154 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\EditorText.module.scss             | SCSS           |         16 |          3 |          3 |         22 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\FriendProfile.module.scss          | SCSS           |        445 |          1 |        131 |        577 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\FriendsNavbar.module.scss          | SCSS           |        112 |          0 |         36 |        148 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\GroupProfile.module.scss           | SCSS           |        420 |          1 |        120 |        541 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\Navbar.module.scss                 | SCSS           |        178 |          0 |         50 |        228 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\css\ReelNavbar.module.scss             | SCSS           |        -86 |          0 |        -28 |       -114 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\CreateGroupModal.tsx             | TypeScript JSX |         67 |          1 |         12 |         80 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\CreatePostModal.tsx              | TypeScript JSX |        163 |          1 |         21 |        185 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\InviteGroupModal.tsx             | TypeScript JSX |        112 |          0 |         14 |        126 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\PostModal.tsx                    | TypeScript JSX |         19 |          1 |          4 |         24 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\css\CreateGroupModal.module.scss | SCSS           |        243 |          0 |         67 |        310 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\css\CreatePostModal.module.scss  | SCSS           |        147 |          0 |         36 |        183 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\component\modal\css\InviteGroupModal.module.scss | SCSS           |        145 |          0 |         35 |        180 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\ChatsPage.module.scss                        | SCSS           |        112 |          2 |         34 |        148 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\FriendsPage.module.scss                      | SCSS           |        118 |          0 |         41 |        159 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\GroupsPage.module.scss                       | SCSS           |        114 |          0 |         35 |        149 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\HomePage.module.scss                         | SCSS           |          4 |          0 |          1 |          5 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\NotificicationPage.module.scss               | SCSS           |         77 |          0 |         18 |         95 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\ReelPage.module.scss                         | SCSS           |          0 |          0 |          1 |          1 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\css\UserProfilePage.module.scss                  | SCSS           |         43 |          0 |          8 |         51 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\ChatsPage.tsx                               | TypeScript JSX |        102 |          0 |         18 |        120 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\FriendsPage.tsx                             | TypeScript JSX |         96 |          0 |         18 |        114 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\GroupsPage.tsx                              | TypeScript JSX |         84 |          0 |         20 |        104 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\NotificationsPage.tsx                       | TypeScript JSX |         81 |          0 |         11 |         92 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\UserProfilePage.tsx                         | TypeScript JSX |         57 |         23 |         10 |         90 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\page\main\story\StoryPage.tsx                         | TypeScript JSX |          0 |          0 |         -2 |         -2 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\provider\ApolloProvider.tsx                           | TypeScript JSX |         24 |          0 |          2 |         26 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\ChatQuery.tsx                                   | TypeScript JSX |        119 |          0 |          5 |        124 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\GroupQuery.tsx                                  | TypeScript JSX |        194 |          0 |         15 |        209 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\NotificationQuery.tsx                           | TypeScript JSX |         28 |          0 |          2 |         30 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\PostQuery.tsx                                   | TypeScript JSX |        125 |          0 |          3 |        128 |
+| c:\TPA\TPA-Web\tpa-web-frontend\src\query\UserQuery.tsx                                   | TypeScript JSX |         84 |          0 |          4 |         88 |
+| c:\TPA\TPA-Web\tpa-web-frontend\vite.config.ts                                            | TypeScript     |          8 |          0 |         -1 |          7 |
+| Total                                                                                     |                |      5,022 |        244 |        995 |      6,261 |
++-------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

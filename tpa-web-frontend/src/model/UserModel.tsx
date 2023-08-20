@@ -1,3 +1,5 @@
+import { Group } from "./GroupModel"
+
 export interface User {
     id: string
     first_name: string
@@ -12,6 +14,7 @@ export interface User {
     pendingFriend: User[]
     blockedUser: ShowUser[]
     specificFriend: ShowUser[]
+    groupInvite: Group[]
 }
 
 export interface ShowUser{

@@ -21,7 +21,6 @@ type User {
   pendingFriend: [User!]
   blockedUser: [User!]
   specificFriend: [User!]
-  notification: [Notification!] @goField(forceResolver: true)
 
   groupInvite: [Group!] @goField(forceResolver: true)
 }
@@ -49,6 +48,7 @@ type Query {
   getUser(id: ID!): User!
   getAllUser: [User!]!
   getAllNonFriend(id: ID!): [User!]!
+
 }
 
 type Mutation {

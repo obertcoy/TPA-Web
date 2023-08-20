@@ -21,6 +21,7 @@ export default function Navbar() {
 
     const [activePage, setActivePage] = useState('home')
     const [profileOpen, setProfileOpen] = useState(false)
+    const [search, setSearch] = useState('')
     const navigate = useNavigate()
 
     const handleNav = (page: string) => {
@@ -41,12 +42,28 @@ export default function Navbar() {
         navigate('/main/chats/')
     }
 
+    const toNotificationPage = () =>{
+        navigate('/main/notifications/')
+    }
+    
+    const toSearchPage = () => {
+        navigate(`/main/search/${search}`)
+    }
+
     const user = getCurrentUser()
 
     const [isModalOpen, setIsModalOpen] = useState(false)
     const handleOpenModal = () => {
         setIsModalOpen(!isModalOpen)
     }
+
+    const handleSearch : React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            toSearchPage()
+            setSearch('')
+        }
+    };
 
     return (
         <div className={style['container']}>
@@ -58,7 +75,7 @@ export default function Navbar() {
                     <img src={fb_icon} alt="" />
                     <div className={style['navbar-left-search']}>
                         <AiOutlineSearch id={style['search-icon']} />
-                        <input type="text" placeholder='Search FaREbook' />
+                        <input type="text" placeholder='Search FaREbook' value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={handleSearch} />
                     </div>
                 </div>
                 <div className={style['navbar-mid']}>
@@ -81,7 +98,7 @@ export default function Navbar() {
                         <FaFacebookMessenger className={style['right-icon']} onClick={toChatPage}/>
                     </div>
                     <div>
-                        <MdNotifications className={style['right-icon']} />
+                        <MdNotifications className={style['right-icon']} onClick={toNotificationPage}/>
                     </div>
 
                     {user?.profileImageURL ? <img src={user?.profileImageURL} alt="" className={style['profile-icon']} onClick={handleOpenProfileCard} /> : <CgProfile className={style['profile-icon']} onClick={handleOpenProfileCard} />}
@@ -201,7 +218,7 @@ function EditSpecificFriend({ user, handleOpenModal }: EditSpecificFriendProps) 
                     {specificFriend.length > 0
                         &&
                         <div className={style['specific-friend-container']}>
-                            <h5>Specific Friends</h5>
+                            <h5>Current Specific Friends</h5>
                             <div className={style['specific-friend-container']}>
                                 {specificFriend.map((user) => (
                                     <div key={user.id} className={style['specific-friend']}>

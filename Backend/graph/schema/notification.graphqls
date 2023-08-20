@@ -4,6 +4,7 @@ type Notification {
   createdAt: Time!
   text: String!
   read: Boolean!
+  fromUser: User!
 }
 
 input NewNotification {

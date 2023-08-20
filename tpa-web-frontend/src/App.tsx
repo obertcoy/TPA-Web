@@ -20,6 +20,7 @@ import FriendsPage from './page/main/FriendsPage'
 import FriendsNavbar from './page/component/FriendsNavbar'
 import ChatsPage from './page/main/ChatsPage'
 import GroupsPage from './page/main/GroupsPage'
+import NotificationsPage from './page/main/NotificationsPage'
 
 function AuthenticatedRoutes() {
   return (
@@ -36,7 +37,7 @@ function AuthenticatedRoutes() {
         <Route path='chats/' element={<ChatsPage />}></Route>
         <Route path='chats/:paramChatRoomID' element={<ChatsPage />}></Route>
         <Route path='groups/' element={<GroupsPage />}></Route>
-
+        <Route path='notifications/' element={<NotificationsPage/>}></Route>
       </Routes>
     </MasterLayout>
   );
