@@ -72,10 +72,65 @@ query GetAllPost{
     sharedBy{
       id
     }
+    tagged{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    group{
+      id
+      name
+    }
     createdAt
   }
 }
 `
+
+export const GET_ALL_POST_DEBUG = gql`
+query GetAllPostDebug{
+  getAllPostDebug{
+    id
+    text
+    fileURL
+    user{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    likedBy{
+      id
+    }
+    comment{
+      id
+      text
+      parentID
+      createdAt
+      likedBy{
+        id
+      }
+      user{
+        id
+        first_name
+        last_name
+        profileImageURL
+      }
+    }
+    sharedBy{
+      id
+    }
+    tagged{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    createdAt
+  }
+}
+`
+
 
 export const GET_POST = gql`
 query GetPost($id: ID!){
@@ -125,6 +180,16 @@ query GetPost($id: ID!){
     sharedBy {
       id
     }
+    tagged{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    group{
+      id
+      name
+    }
     createdAt
   }
 }
@@ -169,5 +234,68 @@ mutation LikeComment($commentID: ID!){
 export const UNLIKE_COMMENT = gql`
 mutation UnlikeComment($commentID: ID!){
   unlikeComment(commentID: $commentID)
+}
+`
+
+export const GET_GROUP_POST = gql`
+query GetGroupPost($groupID: ID!){
+  getGroupPost(groupID: $groupID){
+    id
+    text
+    fileURL
+    user {
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    likedBy {
+      id
+    }
+    comment {
+      id
+      text
+      parentID
+      createdAt
+      likedBy {
+        id
+      }
+      user {
+        id
+        first_name
+        last_name
+        profileImageURL
+      }
+      replies{
+        id
+        text
+        parentID
+        createdAt
+        likedBy {
+          id
+        }
+        user {
+          id
+          first_name
+          last_name
+          profileImageURL
+        }
+      }
+    }
+    sharedBy {
+      id
+    }
+    tagged{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    group{
+      id
+      name
+    }
+    createdAt
+  }
 }
 `

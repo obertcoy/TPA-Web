@@ -1,3 +1,4 @@
+import { ShowGroup } from "./GroupModel"
 import { ShowUser } from "./UserModel"
 
 export interface Post {
@@ -10,6 +11,7 @@ export interface Post {
     comment: Comment[] | null
     sharedBy: CountComponent[] | null
     tagged: ShowUser[] | null
+    group: ShowGroup | null
 }
 
 export interface Comment {

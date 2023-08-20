@@ -15,6 +15,7 @@ type Post {
   tagged: [User]
   createdAt: Time!
   type: String!
+  group: Group  @goField(forceResolver: true)
 }
 
 type Comment {
@@ -32,6 +33,7 @@ input NewPost{
   fileURL: [String]
   taggedID: [String]
   type: String!
+  groupID: String
 }
 
 input NewComment{
@@ -43,6 +45,9 @@ extend type Query{
     getAllPost: [Post!]! 
     getPost(id: ID!): Post! @auth
     getComment(id: ID!): Comment!
+    getUserPost: [Post!]!
+    getAllPostDebug: [Post!]!
+    getGroupPost(groupID: ID!): [Post!]
 }
 
 extend type Mutation{
@@ -53,4 +58,5 @@ extend type Mutation{
     likeComment(commentID: ID!) : Boolean! 
     unlikeComment(commentID: ID!) : Boolean! 
     sharePost(postID: ID!, sharedTo: ID!): Boolean! @auth
+    deletePost(postID: ID!): Boolean!
 }

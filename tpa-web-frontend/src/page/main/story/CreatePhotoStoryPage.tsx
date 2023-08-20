@@ -48,9 +48,21 @@ export default function CreatePhotoStoryPage() {
 
             const file = files[0]
             const fileRef = ref(firebaseStorage, `temps/${v4()}${file.name}`);
-            const snapshot = await uploadBytes(fileRef, file);
-            const url = await getDownloadURL(snapshot.ref);
-            setFileURL(url);
+
+            console.log('test');
+
+            toast.promise(
+                uploadBytes(fileRef, file),
+                {
+                    pending: 'Uploading file...',
+                    success: 'File uploaded successfully!',
+                    error: 'File upload failed',
+                }
+            ).then(async (snapshot) => {
+
+                const url = await getDownloadURL(snapshot.ref);
+                setFileURL(url);
+            })
 
         }
     };
@@ -68,8 +80,14 @@ export default function CreatePhotoStoryPage() {
         if (fileURL != '') {
 
 
-            await uploadFile()
-
+            await toast.promise(
+                uploadFile(),
+                {
+                    pending: 'Publishing...',
+                    success: 'Story successfully published!',
+                    error: 'Publishing failed',
+                }
+            );
             await createStory({
                 variables: {
                     inputStory: {
@@ -113,7 +131,7 @@ export default function CreatePhotoStoryPage() {
                 <div className={style['sidebar-input']}>
 
                     <IoMdPhotos className={style['photo-icon']} style={{ color: "green", cursor: "pointer" }} onClick={handleIconClick} />
-                    <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
+                    <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} accept="image/*" />
                     <h5 >Select a photo</h5>
                 </div>
                 <div className={style['sidebar-button']}>

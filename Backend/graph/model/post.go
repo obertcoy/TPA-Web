@@ -15,6 +15,8 @@ type Post struct {
 	Tagged    []*User    `json:"tagged,omitempty" gorm:"many2many:post_tags;associationForeignKey:UserID;joinForeignKey:PostID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt time.Time  `json:"createdAt"`
 	Type      string     `json:"type"`
+    Group     *Group     `json:"group,omitempty" gorm:"foreignKey:GroupID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	GroupID   *string     `json:"groupID, omitempty"`
 }
 
 type Comment struct {

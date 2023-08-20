@@ -17,6 +17,9 @@ import { useNavigate } from 'react-router-dom'
 import { GET_ALL_STORY } from '../../query/StoryQuery'
 import HomeStoryCard from '../component/card/HomeStoryCard'
 import { Story } from '../../model/StoryModel'
+import { GET_ALL_REEL } from '../../query/ReelQuery'
+import HomeReelCard from '../component/card/HomeReelCard'
+import { Reel } from '../../model/ReelModel'
 
 export default function HomePage() {
 
@@ -31,14 +34,22 @@ export default function HomePage() {
         navigate('/main/create-story/select')
     }
 
+    const toCreateReel = () => {
+        navigate('/main/create-reel/')
+    }
+
     const toUserStory = (userID: string) => {
         navigate(`/main/stories/${userID}`)
+    }
+
+    const toReelPage = (reelID: string) => {
+        sessionStorage.setItem('startReelPage', reelID)
+        navigate(`/main/reels/`)
     }
 
     const handleHeader = (header: string) => {
 
         setActiveHeader(header)
-        console.log(activeHeader);
     }
 
     const handleOpenCreatePost = () => {
@@ -58,12 +69,14 @@ export default function HomePage() {
 
     const { loading, data, refetch: refetchGetAllPost } = useQuery(GET_ALL_POST)
     const { loading: storyLoading, data: storiesData } = useQuery(GET_ALL_STORY)
+    const { loading: reelLoading, data: reelsData } = useQuery(GET_ALL_REEL)
 
     const user = getCurrentUser()
 
+    console.log(activeHeader);
     return (
         <>
-            {openCreatePost && <CreatePostModal handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} />}
+            {openCreatePost && <CreatePostModal handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} initialGroup={null}/>}
             {openPostModal && postModalID && <PostModal postID={postModalID} handleClosePostModal={handleClosePostModal} />}
 
             <div className={style['page-container']}>
@@ -92,7 +105,7 @@ export default function HomePage() {
                                     <div className={style['overlay']}></div>
                                 </div>
                                 :
-                                <div className={style['create-card']}>
+                                <div className={style['create-card']} onClick={toCreateReel}>
                                     <div className={style['create-icon-container']}>
                                         <BsPlusCircleFill className={style['create-icon']} />
                                     </div>
@@ -104,23 +117,32 @@ export default function HomePage() {
                             {activeHeader == 'stories' && storyLoading ? (
                                 <p>Loading stories...</p>
                             ) : (
-                                activeHeader == 'stories' ? storiesData.getAllStory.reduce((uniqueStories: Story[], story: Story) => {
+                                activeHeader == 'stories' && storiesData.getAllStory.reduce((uniqueStories: Story[], story: Story) => {
                                     if (!uniqueStories.some((uniqueStory) => uniqueStory.user.id === story.user.id)) {
                                         uniqueStories.push(story);
                                     }
                                     return uniqueStories;
                                 }, []).map((data: Story) => (
                                     <HomeStoryCard key={data.id} data={data} toUserStory={toUserStory} />
-                                )) : null
+                                ))
                             )}
+                            {activeHeader == 'reels' && reelLoading ? (
+                                <p>Loading reels...</p>
+                            ) : (
+                                activeHeader == 'reels' &&
+                                reelsData.getAllReel.map((data: Reel) => (
+                                    <HomeReelCard data={data} toReelPage={toReelPage} />
+                                ))
+                            )
+                            }
 
 
                         </div>
                     </div>
                     <div className={style['create-post-container']}>
                         <div className={style['create-post-input']}>
-                            <CgProfile className={style['profile-icon']} />
-                            <button onClick={handleOpenCreatePost}>What's on your mind, Obert?</button>
+                            {user?.profileImageURL ? <img src={user?.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
+                            <button onClick={handleOpenCreatePost}>What's on your mind, {user?.first_name}?</button>
                         </div>
                         <hr />
                         <div className={style['create-post-decor']}>

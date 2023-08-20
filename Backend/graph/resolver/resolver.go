@@ -1,6 +1,9 @@
-package graph
+package resolver
 
-import "gorm.io/gorm"
+import (
+	"github.com/obertcoy/tpa-web/graph/model"
+	"gorm.io/gorm"
+)
 
 // This file will not be regenerated automatically.
 //
@@ -10,4 +13,5 @@ import "gorm.io/gorm"
 
 type Resolver struct{
 	Database *gorm.DB
+	ChatRoomChannel map[string]map[string] chan []*model.Chat
 }

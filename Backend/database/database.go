@@ -37,6 +37,7 @@ func GetInstance() *gorm.DB {
 func MigrateTable() {
 
 	db := GetInstance()
-	db.AutoMigrate(&model.User{}, &model.Post{}, &model.Comment{}, &model.Story{})
+	db.AutoMigrate(&model.User{}, &model.Post{},  &model.Reel{}, &model.Comment{}, &model.ReelComment{}, &model.Story{},
+		&model.Notification{}, &model.ChatRoom{}, &model.Chat{}, &model.Group{}, &model.UserGroupRole{}, &model.GroupFile{})
 
 }

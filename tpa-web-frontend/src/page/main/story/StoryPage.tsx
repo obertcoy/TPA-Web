@@ -1,5 +1,5 @@
 import style from '../../css/StoryPage.module.scss'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { GET_USER_STORY } from '../../../query/StoryQuery'
 import { Story } from '../../../model/StoryModel'
@@ -9,7 +9,6 @@ import { GrFormPrevious, GrFormNext } from 'react-icons/gr'
 export default function StoryPage() {
 
     const { userID } = useParams()
-    const navigate = useNavigate()
     const [arrLen, setArrLen] = useState(0)
     const [activeIdx, setActiveIdx] = useState(0)
 
@@ -24,9 +23,11 @@ export default function StoryPage() {
         refetch()
         setActiveIdx(0)
 
-
-
     }, [userID])
+
+    setTimeout(() => {
+        handleClick('next')
+    }, 5000)
 
     useEffect(() => {
         const nextTimer = setInterval(() => {
@@ -37,15 +38,16 @@ export default function StoryPage() {
     }, [activeIdx])
 
 
+
     useEffect(() => {
 
         if (data?.getUserStory) {
             setArrLen(data?.getUserStory.length)
             console.log(arrLen);
+
         }
 
     }, [data])
-
 
     const handleClick = (type: string) => {
 

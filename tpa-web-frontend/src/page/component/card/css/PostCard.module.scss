@@ -25,7 +25,10 @@
             .profile-icon {
 
                 width: 2rem;
-                height: auto;
+                height: 2rem;
+                border-radius: 50%;
+                object-fit: cover;
+
             }
 
             div {
@@ -51,13 +54,17 @@
             padding: 0 1rem;
             margin: 2vh 0;
 
-            textarea {
+            div{
 
-                width: 100%;
-                height: 15vh;
-                border: none;
-                outline: none;
-                resize: none;
+                
+                textarea {
+                    
+                    width: 100%;
+                    height: 15vh;
+                    border: none;
+                    outline: none;
+                    resize: none;
+                }
             }
 
             textarea::placeholder {

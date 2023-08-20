@@ -1,0 +1,536 @@
+$fb-blue :#1877f2;
+$default-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
+$post-gap: 2.5vh;
+$card-content-padding: 1rem;
+$banner-height: 40vh;
+
+.page-container {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin-left: var(--sidebar-width);
+
+
+    .header-container {
+
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: fit-content;
+        background-color: white;
+        align-items: center;
+        box-shadow: var(--default-shadow);
+
+        .profile-container {
+
+            display: flex;
+            flex-direction: column;
+            width: 80%;
+            position: relative;
+
+            .banner-container {
+                display: flex;
+                position: relative;
+
+                .banner {
+
+                    width: 100%;
+                    height: $banner-height;
+                    border-radius: 0 0 20px 20px;
+                    object-fit: cover;
+                }
+
+                #banner-btn {
+
+                    position: absolute;
+                    display: flex;
+                    background-color: rgba(black, 0.4);
+                    color: white;
+                    padding: 1em 1.5em;
+                    bottom: 5%;
+                    right: 2%;
+                    align-items: center;
+                    gap: 0.5em;
+                    border-radius: 10px;
+                    font-size: small;
+                    font-weight: 500;
+                    cursor: pointer;
+
+                    .btn-icon {
+                        width: 1.2em;
+                        height: auto;
+                    }
+                }
+
+                #banner-btn:hover {
+                    background-color: rgba(black, 0.6);
+                }
+
+
+            }
+
+            .profile {
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 1rem 2rem;
+                width: 97%;
+                position: relative;
+                height: 7.5rem;
+                white-space: nowrap;
+
+                .button-container {
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    gap: 0.5rem;
+                    align-self: flex-end;
+                    justify-content: flex-end;
+
+                    button {
+
+                        display: flex;
+                        padding: 0.8em 1rem;
+                        align-items: center;
+                        gap: 0.5em;
+
+                        .btn-icon {
+                            width: 1.2em;
+                            height: auto;
+                        }
+                    }
+
+                    #know-btn {
+                        color: black;
+                    }
+
+                    #chat-btn {
+                        color: black;
+                        font-weight: 500;
+                    }
+
+                }
+
+            }
+
+            .non-friend-container {
+
+                display: flex;
+                flex-direction: column;
+                width: 97%;
+                border: var(--default-border);
+                border-radius: var(--default-border-radius);
+                padding: 1em;
+                margin: 0 0 1em;
+                gap: 1rem;
+                box-shadow: var(--default-shadow);
+
+                h4 {
+                    font-weight: 500;
+                }
+
+                .non-friend-card-container {
+
+                    display: flex;
+                    flex-direction: row;
+                    min-width: 100%;
+                    gap: 0.5rem;
+
+                    .non-friend-card {
+
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 0.5rem;
+                        border-radius: 10px;
+                        width: calc(100%/6);
+                        height: 25vh;
+                        box-shadow: var(--default-shadow);
+                        border: var(--default-border);
+                        cursor: pointer;
+
+                        .profile-icon {
+
+                            width: 100%;
+                            height: 80%;
+                            object-fit: cover;
+                            border-radius: 10px 10px 0 0;
+
+                        }
+
+                        div {
+
+                            display: flex;
+                            flex-direction: column;
+                            // align-items: center;
+                            text-align: start;
+                            width: 80%;
+                            padding-bottom: 5%;
+
+                            h5 {
+                                font-weight: 500;
+                            }
+
+                            h6 {
+                                color: gray;
+                                font-weight: 400;
+                            }
+
+                            .add-friend-btn {
+
+                                display: flex;
+                                align-self: center;
+                                justify-content: center;
+                                background-color: rgba($fb-blue, 0.15);
+                                width: 100%;
+                                gap: 0.5em;
+                                padding: 0.75em;
+                                margin-top: 1em;
+                                color: var(--default-blue-text);
+                                border-radius: var(--default-border-radius);
+
+                            }
+
+                            .add-friend-btn:hover {
+                                background-color: rgba(rgb(96, 136, 206), 0.3);
+
+                            }
+
+                            .pending-btn {
+
+                                display: flex;
+                                align-self: center;
+                                justify-content: center;
+                                background-color: rgba(gray, 0.15);
+                                width: 100%;
+                                gap: 0.5em;
+                                padding: 0.75em;
+                                margin-top: 1em;
+                                color: gray;
+                                border-radius: var(--default-border-radius);
+
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+            .header-title-container {
+
+                display: flex;
+                flex-direction: row;
+                width: 50%;
+                height: 2.5rem;
+
+                div {
+
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    width: 50%;
+                    cursor: pointer;
+
+                    h5 {
+                        font-weight: 500;
+                    }
+                }
+
+                .header-title-active {
+
+                    border-bottom: 2px solid $fb-blue;
+                    height: 100%;
+                    color: $fb-blue;
+                }
+            }
+
+        }
+
+    }
+
+    .container {
+
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        width: 80%;
+        margin-top: $post-gap;
+        gap: $post-gap;
+        height: 100%;
+        padding-bottom: 2rem;
+
+        .side-container {
+
+            display: flex;
+            flex-direction: column;
+            width: 45%;
+            gap: $post-gap;
+
+
+            .about-container {
+
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                background-color: white;
+                border: var(--default-border);
+                border-radius: var(--default-border-radius);
+                box-shadow: var(--default-shadow);
+
+                h3 {
+                    margin: 1em 1.5em 0.5em;
+                }
+
+                .about-content {
+
+                    flex: flex;
+                    flex-direction: column;
+                    align-self: center;
+                    padding: 1em;
+                    border: var(--default-bg);
+                    width: 85%;
+                    height: 100%;
+
+                    p {
+                        display: flex;
+                        color: gray;
+                        font-size: medium;
+                        align-items: center;
+                        gap: 0.5em;
+                        margin: 0.5em 0;
+                        font-weight: 500;
+
+                        .intro-icon {
+
+                            width: 1.25em;
+                            height: auto;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        .posts-container {
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 65%;
+            gap: $post-gap;
+            height: 100%;
+
+            .create-post-container {
+
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                background-color: white;
+                border-radius: 6px;
+                box-shadow: var(--default-shadow);
+
+
+                .create-post-input {
+
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    width: 100%;
+
+                    padding: $card-content-padding;
+                    gap: 1vw;
+
+                    .profile-icon {
+
+                        width: 2.5rem;
+                        height: 2.5rem;
+                        border-radius: 50%;
+                        object-fit: cover;
+                    }
+
+                    button {
+                        background-color: #f0f2f5;
+                        width: 85%;
+                        color: gray;
+                        font-weight: lighter;
+                        border-radius: 50px;
+                        padding: 1rem;
+                        text-align: left;
+                    }
+
+                    button:hover {
+                        background-color: var(--default-bg-hover);
+                    }
+                }
+
+                .create-post-decor {
+
+                    display: flex;
+                    flex-direction: row;
+                    padding: $card-content-padding;
+                    width: 90%;
+                    justify-content: center;
+                    margin: auto;
+                    align-items: center;
+
+                    div {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        gap: 0.5vw;
+
+                        p {
+                            font-size: small;
+                            color: gray;
+                            font-weight: 500;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    .post-header-view {
+
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 2.5rem;
+
+        div {
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 50%;
+            cursor: pointer;
+        }
+
+        .header-post-active {
+
+            border-bottom: 2px solid $fb-blue;
+            height: 100%;
+            color: $fb-blue;
+        }
+    }
+}
+
+.create-post-container {
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: var(--default-shadow);
+
+}
+
+.post-card-container-list {
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    gap: $post-gap;
+}
+
+.post-card-container-grid {
+
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+
+    div {
+        width: 100%;
+    }
+}
+
+.members-container {
+
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+    height: 100%;
+    margin-top: $post-gap;
+    gap: calc($post-gap / 2);
+    background-color: white;
+    border-radius: var(--default-border-radius);
+    box-shadow: var(--default-shadow);
+    padding: 1.5rem;
+    align-items: center;
+
+    hr {
+        width: 100%;
+    }
+
+    .member-card-container {
+
+        display: grid;
+        padding: 1rem;
+        width: 95%;
+        height: 100%;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.5rem;
+        gap: 1em;
+        background-color: var(--default-bg);
+        border-radius: var(--default-border-radius);
+        border: var(--default-border);
+
+        .member-card {
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5vw;
+            border-radius: 10px;
+            width: 100%;
+            height: 25vh;
+            box-shadow: var(--default-shadow-bold);
+            background-color: white;
+            cursor: pointer;
+
+            .profile-icon {
+
+                width: 100%;
+                height: 80%;
+                object-fit: cover;
+                border-radius: 10px 10px 0 0;
+
+            }
+
+            div {
+
+                display: flex;
+                flex-direction: column;
+                text-align: start;
+                width: 80%;
+                padding-bottom: 5%;
+
+                h5 {
+                    font-weight: 500;
+                }
+
+                h6 {
+                    color: lightgray;
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+}

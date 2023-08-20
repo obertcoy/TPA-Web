@@ -2,7 +2,7 @@
 
     display: flex;
     flex-direction: column;
-    height: 20vh;
+    height: var(--home-card-height);
     border-radius: 10px;
     box-shadow: var(--default-shadow);
     align-items: center;
@@ -12,20 +12,22 @@
     cursor: pointer;
     overflow: hidden;
 
-    .profile-icon{
+    .profile-icon {
 
         position: absolute;
-        width: 2em;
-        height: auto;
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
         border: 3px solid var(--default-blue-text);
         background-color: white;
         top: 0.75em;
         left: 0.75em;
         z-index: 2;
+        object-fit: cover;
+
     }
 
-    .story-bg{
+    .story-bg {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -33,16 +35,20 @@
         transition: 0.5s cubic-bezier(0.215, 0.610, 0.355, 1);
     }
 
-    h6{
+    .name-container {
+
         position: absolute;
-        left: 1.25em;
-        bottom: 1em;
-        color: white;
-        word-break: break-word;
-        z-index: 2;
+        bottom: 0.5em;
+        display: flex;
+        width: 80%;
+        h6 {
+            color: white;
+            word-break: break-word;
+            z-index: 2;
+        }
     }
 
-    .overlay{
+    .overlay {
         display: none;
         position: absolute;
         width: 100%;
@@ -52,10 +58,10 @@
     }
 }
 
-.card-container:hover > .overlay{
+.card-container:hover>.overlay {
     display: block;
 }
 
-.card-container:hover > .story-bg{
+.card-container:hover>.story-bg {
     transform: scale(1.1);
 }

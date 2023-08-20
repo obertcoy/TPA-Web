@@ -12,9 +12,12 @@
 
         .profile-icon {
 
-            width: 2em;
-            height: auto;
-
+            margin-top: 0.5rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: var(--default-border);
         }
 
         div {
@@ -24,7 +27,7 @@
             width: 100%;
             // background-color: var(--default-bg); 
             border-radius: 10px;
-            padding: 0.2em 0.8em;
+            padding: 0.2em 0.5em;
 
             h5 {
                 font-weight: 500;
@@ -48,11 +51,16 @@
                     font-weight: 400;
                 }
 
-                p {
+                .reply-btn{
                     font-size: x-small;
                     font-weight: 500;
+                    color: gray;
                 }
-
+                p {
+                    font-size: small;
+                    font-weight: 400;
+                    color: black;
+                }
             }
         }
 
@@ -89,9 +97,12 @@
 
             .profile-icon {
 
-                width: 1.5em;
-                height: auto;
-                margin-bottom: auto;
+                width: 2rem;
+                height: 2rem;
+                border-radius: 50%;
+                // margin-bottom: auto;
+                object-fit: cover;
+
             }
 
             div {
@@ -107,6 +118,7 @@
                 .send-icon {
                     margin: auto;
                     color: gray;
+                    margin-right: 0.5rem;
                 }
 
                 .send-icon:hover {

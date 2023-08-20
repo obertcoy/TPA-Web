@@ -1,0 +1,57 @@
+type Group{
+    id:ID!
+    name: String!
+    bannerImageURL: String
+    user:[User!] @goField(forceResolver: true)
+    createdAt: Time!
+    groupFile: [GroupFile!] @goField(forceResolver: true)
+    pendingUser: [User!]
+}
+
+type GroupFile{
+    id: ID!
+    user: User! @goField(forceResolver: true)
+    fileURL: String!
+    fileName: String!
+    type: String!
+    createdAt: Time!
+}
+
+input NewGroup{
+    name: String!
+    private: Boolean!
+}
+
+input NewGroupFile{
+    fileURL: String!
+    fileName: String!
+    type: String!
+}
+
+type GroupUser{
+    user: User! @goField(forceResolver: true)
+    role: String!
+}
+
+extend type Query{
+
+    getAllUserGroup:[Group!]
+    getGroup(groupID: ID!): Group!
+    getAllGroupFile(groupID: ID!): [GroupFile!]
+
+    checkAdminUser(groupID: ID!): Boolean!
+    getAllGroupUser(groupID: ID!): [GroupUser!]
+}
+
+extend type Mutation{
+
+    createGroup(inputGroup: NewGroup!): Group!
+    promoteMember(groupID: ID!, userID: ID!): Boolean!
+    approveRequest(groupID: ID!, userID: ID!): Boolean!
+    kickMember(groupID: ID!, userID: ID!): Boolean!
+    editGroupBanner(groupID: ID!, fileURL: String!): Boolean!
+    deleteGroupFile(groupID: ID!, fileID: String!): Boolean!
+    inviteFriend(groupID: ID!, userID: ID!): Boolean!
+    requestJoinGroup(groupID:ID!): Boolean!
+    leaveGroup(groupID: ID!): Boolean!
+}

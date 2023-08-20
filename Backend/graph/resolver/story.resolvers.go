@@ -1,4 +1,4 @@
-package graph
+package resolver
 
 // This file will be automatically regenerated based on the schema, any resolver implementations
 // will be copied through when generating and any unknown code will be moved to the end.
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/obertcoy/tpa-web/graph"
 	"github.com/obertcoy/tpa-web/graph/model"
 	"github.com/obertcoy/tpa-web/graph/service"
 )
@@ -52,8 +53,11 @@ func (r *queryResolver) GetUserStory(ctx context.Context, userID string) ([]*mod
 // GetAllStory is the resolver for the getAllStory field.
 func (r *queryResolver) GetAllStory(ctx context.Context) ([]*model.Story, error) {
 	var stories []*model.Story
+	userID := ctx.Value("TokenHeader").(string)
 
-	return stories, r.Database.Order("created_at DESC").Find(&stories).Error
+	friendID := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", userID)
+
+	return stories, r.Database.Where("user_id IN (?) OR user_id = ?", friendID, userID).Order("created_at DESC").Find(&stories).Error
 }
 
 // User is the resolver for the user field.
@@ -61,7 +65,7 @@ func (r *storyResolver) User(ctx context.Context, obj *model.Story) (*model.User
 	return service.GetUser(ctx, obj.UserID)
 }
 
-// Story returns StoryResolver implementation.
-func (r *Resolver) Story() StoryResolver { return &storyResolver{r} }
+// Story returns graph.StoryResolver implementation.
+func (r *Resolver) Story() graph.StoryResolver { return &storyResolver{r} }
 
 type storyResolver struct{ *Resolver }

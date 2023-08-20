@@ -6,10 +6,25 @@ import (
 	"time"
 )
 
+type GroupUser struct {
+	User *User  `json:"user"`
+	Role string `json:"role"`
+}
 
 type LoginCredential struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type NewChat struct {
+	Text       *string `json:"text,omitempty"`
+	FileURL    *string `json:"fileURL,omitempty"`
+	ChatRoomID string  `json:"chatRoomID"`
+}
+
+type NewChatRoom struct {
+	UserID  []string `json:"userID,omitempty"`
+	GroupID *string  `json:"groupID,omitempty"`
 }
 
 type NewComment struct {
@@ -17,11 +32,38 @@ type NewComment struct {
 	ParentID *string `json:"parentID,omitempty"`
 }
 
+type NewGroup struct {
+	Name    string `json:"name"`
+	Private bool   `json:"private"`
+}
+
+type NewGroupFile struct {
+	FileURL  string `json:"fileURL"`
+	FileName string `json:"fileName"`
+	Type     string `json:"type"`
+}
+
+type NewNotification struct {
+	UserID string `json:"userID"`
+	Text   string `json:"text"`
+}
+
 type NewPost struct {
 	Text     string    `json:"text"`
 	FileURL  []*string `json:"fileURL,omitempty"`
 	TaggedID []*string `json:"taggedID,omitempty"`
 	Type     string    `json:"type"`
+	GroupID  *string   `json:"groupID,omitempty"`
+}
+
+type NewReel struct {
+	Text    string `json:"text"`
+	FileURL string `json:"fileURL"`
+}
+
+type NewReelComment struct {
+	Text     string  `json:"text"`
+	ParentID *string `json:"parentID,omitempty"`
 }
 
 type NewStory struct {

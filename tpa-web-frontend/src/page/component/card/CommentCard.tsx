@@ -9,26 +9,37 @@ import { CREATE_COMMENT, LIKE_COMMENT, UNLIKE_COMMENT } from '../../../query/Pos
 import { useMutation } from '@apollo/client'
 import { IoMdSend } from 'react-icons/io'
 import ReplyCard from './ReplyCard'
+import { CREATE_REEL_COMMENT, LIKE_REEL_COMMENT, UNLIKE_REEL_COMMENT } from '../../../query/ReelQuery'
+import EditorText from '../EditorText'
+import { ContentState } from 'draft-js'
 
 interface CommentCardProps {
     data: Comment
-    postID: string
+    postID: string | null
+    reelID: string | null
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    refetchPost: (variables?: Partial<any>) => Promise<any>;
+    refetch: (variables?: Partial<any>) => Promise<any>;
 
 }
 
-export default function CommentCard({ data, postID, refetchPost }: CommentCardProps) {
+export default function CommentCard({ data, postID, reelID, refetch }: CommentCardProps) {
 
     const user = getCurrentUser()
+
     const [isLiked, setIsLiked] = useState(data.likedBy?.some(like => like.id === user?.id) || false)
     const [likeCount, setLikeCount] = useState(data.likedBy?.length || 0)
     const [likeComment] = useMutation(LIKE_COMMENT)
     const [unlikeComment] = useMutation(UNLIKE_COMMENT)
     const [createReply] = useMutation(CREATE_COMMENT)
 
+    const [likeReelComment] = useMutation(LIKE_REEL_COMMENT)
+    const [unlikeReelComment] = useMutation(UNLIKE_REEL_COMMENT)
+    const [createReelReply] = useMutation(CREATE_REEL_COMMENT)
+
     const [replyText, setReplyText] = useState('')
     const [replyOpen, setReplyOpen] = useState(false)
+    const [resetEditor, setResetEditor] = useState(false)
+
 
     const handleOpenCreateReply = () => {
         setReplyOpen(!replyOpen)
@@ -36,52 +47,88 @@ export default function CommentCard({ data, postID, refetchPost }: CommentCardPr
 
     const handleCreateReply = async () => {
         if (replyText != '') {
-            await createReply({
-                variables: {
-                    inputComment: {
-                        text: replyText,
-                        parentID: data.id
-                    },
-                    postID: postID
-                }
-            })
-            setReplyText('')
-            refetchPost()
-        }
-    }
+            if (postID) {
 
+                await createReply({
+                    variables: {
+                        inputComment: {
+                            text: replyText,
+                            parentID: data.id
+                        },
+                        postID: postID
+                    }
+                })
+            } else if (reelID) {
+                await createReelReply({
+                    variables: {
+                        inputReelComment: {
+                            text: replyText,
+                            parentID: data.id
+                        },
+                        reelID: reelID
+                    }
+                })
+            }
+            setReplyText('')
+            handleOpenCreateReply()
+            setResetEditor(!resetEditor)
+            refetch()
+        }
+    }    
 
     const handleLike = async () => {
 
-        if (!isLiked) {
-            await likeComment({
-                variables: {
-                    commentID: data?.id
-                }
-            })
-            setLikeCount(likeCount + 1)
+        if (postID) {
 
+            if (!isLiked) {
+                await likeComment({
+                    variables: {
+                        commentID: data?.id
+                    }
+                })
+                setLikeCount(likeCount + 1)
+
+            }
+            else {
+                await unlikeComment({
+                    variables: {
+                        commentID: data?.id
+                    }
+                })
+                setLikeCount(likeCount - 1)
+            }
+        } else if (reelID) {
+            if (!isLiked) {
+                await likeReelComment({
+                    variables: {
+                        reelCommentID: data?.id
+                    }
+                })
+                setLikeCount(likeCount + 1)
+
+            }
+            else {
+                await unlikeReelComment({
+                    variables: {
+                        reelCommentID: data?.id
+                    }
+                })
+                setLikeCount(likeCount - 1)
+            }
         }
-        else {
-            await unlikeComment({
-                variables: {
-                    commentID: data?.id
-                }
-            })
-            setLikeCount(likeCount - 1)
-
-        }
-
         setIsLiked(!isLiked)
     }
 
     return (
         <div className={style['card-container']}>
             <div className={style['card-body']}>
-                {user?.profileImageURL ? <img src={user?.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
+                {data.user?.profileImageURL ? <img src={data.user?.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
                 <div>
                     <h5>{data.user.first_name} {data.user.last_name}</h5>
-                    <p>{data.text}</p>
+                    <p>
+                        {data.text}
+                    </p>
+                    {/* <div dangerouslySetInnerHTML={{ __html: DisplayTextFromHTML(data?.text) }} /> */}
                     <div>
                         <h6>{timeSinceShort(new Date(data?.createdAt))}</h6>
                         {likeCount > 0 ? (
@@ -89,7 +136,7 @@ export default function CommentCard({ data, postID, refetchPost }: CommentCardPr
                         ) : (
                             null
                         )}
-                        <p onClick={handleOpenCreateReply}>Reply</p>
+                        <p onClick={handleOpenCreateReply} className={style['reply-btn']}>Reply</p>
                     </div>
                 </div>
                 {isLiked ?
@@ -100,9 +147,10 @@ export default function CommentCard({ data, postID, refetchPost }: CommentCardPr
             </div>
             <div className={style['reply-input-container']} style={replyOpen ? { display: 'flex' } : { display: 'none' }}>
                 <div className={style['reply-input']}>
-                    {user?.profileImageURL ? <img src={user?.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
+                    {data.user?.profileImageURL ? <img src={data.user?.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
                     <div>
-                        <input type="text" onChange={(e) => setReplyText(e.target.value)} value={replyText} placeholder="Write a reply..." />
+                        <EditorText handleOnChange={setReplyText} placeholder={'Write a reply...'} resetEditor={resetEditor} initialValue={ContentState.createFromText(`@${data.user.first_name} ${data.user.last_name}`)}/>
+                        {/* <input type="text" onChange={(e) => setReplyText(e.target.value)} value={replyText} placeholder="Write a reply..." /> */}
                         <IoMdSend className={style['send-icon']} onClick={handleCreateReply} />
                     </div>
                 </div>
@@ -112,7 +160,8 @@ export default function CommentCard({ data, postID, refetchPost }: CommentCardPr
                 (
                     <div className={style['reply-container']}>
                         {data.replies.map((replyData) => (
-                            <ReplyCard data={replyData} postID={postID} />
+
+                            <ReplyCard key={replyData.id} data={replyData} parentID={data.id} postID={postID} reelID={reelID} refetch={refetch}/>
                         ))}
                     </div>
                 )

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Navbar from "./Navbar";
 import style from './css/MasterLayout.module.scss'
 import { User } from "../../model/UserModel";
+import { useQuery } from "@apollo/client";
 
 interface MasterLayoutProps {
     children: ReactNode;

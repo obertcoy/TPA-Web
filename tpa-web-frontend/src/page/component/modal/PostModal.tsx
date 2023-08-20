@@ -1,7 +1,6 @@
 import style from './css/PostModal.module.scss'
 import { CgProfile } from 'react-icons/cg'
 import { GrClose } from 'react-icons/gr'
-
 import 'firebase/storage'
 import { getCurrentUser } from '../MasterLayout'
 import { Post } from '../../../model/PostModel'
@@ -14,6 +13,8 @@ import { useState, useEffect } from 'react'
 import { IoMdSend } from 'react-icons/io'
 import CommentCard from '../card/CommentCard'
 import { timeSinceLong } from '../../../helper/DateHelper'
+import { useNavigate } from 'react-router-dom'
+import { DisplayTextFromHTML } from '../../../helper/TextHelper'
 
 
 interface PostModalProps {
@@ -33,8 +34,6 @@ export default function PostModal({ postID, handleClosePostModal }: PostModalPro
         fetchPolicy: "network-only"
 
     })
-
-    console.log(data?.getPost?.likedBy?.length);
 
     const [likePost] = useMutation(LIKE_POST)
     const [unlikePost] = useMutation(UNLIKE_POST)
@@ -91,11 +90,19 @@ export default function PostModal({ postID, handleClosePostModal }: PostModalPro
         }
     }
 
+    const navigate = useNavigate()
+
+    const toUserProfile = (userID: string) => {
+        navigate(`/main/profile/${userID}`)
+    }
+
     if (loading) {
         return (
             <p>Loading...</p>
         )
     }
+
+
 
     return (
         <div className={style['page-container']}>
@@ -109,25 +116,48 @@ export default function PostModal({ postID, handleClosePostModal }: PostModalPro
                     <div className={style['card-container']}>
                         <div className={style['card-body']}>
                             <div className={style['card-body-profile']}>
-                                {user?.profileImageURL ? <img src={user?.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
+                                {data?.getPost.user?.profileImageURL ? <img src={data?.getPost.user.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
                                 <div>
-                                    <h5>{data?.getPost?.user?.first_name + " " + data?.getPost?.user?.last_name}</h5>
+                                    <h5>
+                                        {data?.getPost.user.first_name} {data?.getPost.user.last_name}
+                                        {data?.getPost.tagged && data?.getPost.tagged.length > 0 && (
+                                            <>
+                                                <span style={{ fontWeight: '400' }}> is with </span>
+                                                {data?.getPost.tagged.map((user, index) => (
+                                                    <span key={user.id} onClick={() => toUserProfile(user.id)} style={{ cursor: 'pointer' }}>
+                                                        {index > 0 && ", "}
+                                                        {user.first_name} {user.last_name}
+                                                    </span>
+                                                ))}
+                                            </>
+                                        )}
+                                    </h5>
                                     <h6>{timeSinceLong(new Date(data?.getPost?.createdAt || ""))}</h6>
                                 </div>
                             </div>
                             <div className={style['card-content-text']}>
-                                <p>{data?.getPost?.text}</p>
+                                <div dangerouslySetInnerHTML={{ __html: DisplayTextFromHTML(data?.getPost.text)}} />
                             </div>
                             {data?.getPost?.fileURL &&
-                                <div className={style['card-content-file']}>
-                                    {data.getPost?.fileURL.map((url) => {
+                                <div className={data.getPost.fileURL.length > 1 ? style['card-content-file-multi'] : style['card-content-file']}>
+                                    {data.getPost?.fileURL.map((url, idx) => {
                                         if (url.includes('.mp4')) {
                                             return (
-                                                <video key={url} src={url} className={style['uploaded-file']} controls />
+                                                <video key={url} src={url} className={data.getPost?.fileURL &&
+                                                    data.getPost?.fileURL?.length % 2 === 1 && idx === data.getPost?.fileURL?.length - 1
+                                                    ? style['uploaded-file-long']
+                                                    : style['uploaded-file']
+                                                }
+                                                    controls
+                                                />
                                             )
                                         } else {
                                             return (
-                                                <img key={url} src={url} className={style['uploaded-file']} />
+                                                <img key={url} src={url} className={data.getPost?.fileURL &&
+                                                    data.getPost?.fileURL?.length % 2 === 1 && idx === data.getPost?.fileURL?.length - 1
+                                                    ? style['uploaded-file-long']
+                                                    : style['uploaded-file']
+                                                } />
                                             )
                                         }
                                     })}
@@ -170,7 +200,7 @@ export default function PostModal({ postID, handleClosePostModal }: PostModalPro
                             {data?.getPost.comment && data?.getPost.comment.length > 0 && (
                                 <div className={style['comment-container']}>
                                     {data.getPost.comment.filter(commentData => commentData.parentID == null).map((commentData) => (
-                                        <CommentCard key={commentData.id} data={commentData} postID={data?.getPost?.id} refetchPost={refetchPost} />
+                                        <CommentCard key={commentData.id} data={commentData} postID={data?.getPost?.id} reelID={null} refetch={refetchPost} />
                                     ))}
                                 </div>
                             )}
@@ -183,6 +213,7 @@ export default function PostModal({ postID, handleClosePostModal }: PostModalPro
                         {user?.profileImageURL ? <img src={user?.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
                         <div>
                             <input type="text" onChange={(e) => setCommentText(e.target.value)} value={commentText} placeholder="Write a comment..." />
+                            {/* <EditorText handleOnChange={setCommentText} placeholder={'Write a comment...'}/> */}
                             <IoMdSend className={style['send-icon']} onClick={handleCreateComment} />
                         </div>
                     </div>

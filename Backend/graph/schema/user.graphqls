@@ -15,7 +15,15 @@ type User {
   dob: Time!
   activated: Boolean!
   profileImageURL: String
-  friend: [User!] 
+  bannerImageURL: String
+
+  friend: [User!]
+  pendingFriend: [User!]
+  blockedUser: [User!]
+  specificFriend: [User!]
+  notification: [Notification!] @goField(forceResolver: true)
+
+  groupInvite: [Group!] @goField(forceResolver: true)
 }
 
 type UserAuthorization {
@@ -40,6 +48,7 @@ input NewUser {
 type Query {
   getUser(id: ID!): User!
   getAllUser: [User!]!
+  getAllNonFriend(id: ID!): [User!]!
 }
 
 type Mutation {
@@ -51,4 +60,18 @@ type Mutation {
   updateUser(id: ID!, inputUser: NewUser!): User!
   deleteUser(id: ID!): User!
   loginUser(inputCredential: LoginCredential!): UserAuthorization!
+
+  updateProfileImage(fileURL: String!): Boolean!
+  updateBannerImage(fileURL: String!): Boolean!
+
+  sendFriendRequest(friendID: ID!): Boolean!
+  acceptFriendRequest(friendID: ID!): Boolean!
+  rejectFriendRequest(friendID: ID!): Boolean!
+  blockUser(userID: ID!): Boolean!
+
+  addSpecificFriend(friendID: ID!): Boolean!
+  removeSpecificFriend(friendID: ID!): Boolean!
+  
+  acceptGroupInvite(groupID: ID!): Boolean!
+  rejectGroupInvite(groupID: ID!): Boolean!
 }

@@ -1,0 +1,48 @@
+type Reel {
+  id: ID!
+  text: String!
+  fileURL: String!
+  user: User! @goField(forceResolver: true)
+  likedBy: [User]
+  comment: [ReelComment] @goField(forceResolver: true)
+  sharedBy: [User]
+  createdAt: Time!
+}
+
+input NewReel {
+    text:String!
+  fileURL: String!
+}
+
+type ReelComment {
+  id: ID!
+  text: String!
+  createdAt: Time!
+  user: User! @goField(forceResolver: true)
+  replies: [ReelComment] @goField(forceResolver: true)
+  parentID: ID
+  likedBy: [User]
+}
+
+
+input NewReelComment{
+  text: String!
+  parentID: String
+}
+
+extend type Query {
+  getUserReel(userID: ID!): [Reel!]!
+  getAllReel: [Reel!]!
+  getReel(reelID: ID!): Reel!
+}
+
+extend type Mutation {
+  createReel(inputReel: NewReel!): Reel!
+  deleteReel(reelID: ID!): Boolean!
+  createReelComment(inputReelComment: NewReelComment!, reelID: ID!): ReelComment!
+  likeReel(reelID: ID!): Boolean! @auth
+  unlikeReel(reelID: ID!): Boolean! @auth
+  likeReelComment(reelCommentID: ID!): Boolean!
+  unlikeReelComment(reelCommentID: ID!): Boolean!
+  shareReel(reelID: ID!, sharedTo: ID!): Boolean! @auth
+}
