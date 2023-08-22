@@ -6,7 +6,6 @@ import { CgProfile } from "react-icons/cg"
 import { useNavigate } from "react-router-dom"
 import { timeSinceLong } from "../../helper/DateHelper"
 import { useState } from "react"
-import { color } from "html2canvas/dist/types/css/types/color"
 import { getCurrentUser } from "../component/MasterLayout"
 import { ACCEPT_GROUP_INVITE, GET_USER, REJECT_GROUP_INVITE } from "../../query/UserQuery"
 import { User } from "../../model/UserModel"
@@ -44,7 +43,7 @@ export default function NotificationsPage() {
     }
 
     const toGroup = (groupID: string) => {
-        navigate(`/main/groups/${groupID}}`)
+        navigate(`/main/groups/${groupID}`)
     }
 
     return (

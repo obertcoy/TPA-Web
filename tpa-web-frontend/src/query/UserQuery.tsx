@@ -220,6 +220,48 @@ query GetAllNonFriend($id: ID!){
   }
 }
 `
+export const GET_PEOPLE_YOU_MAY_KNOW = gql`
+query GetPeopleYouMayKnow($id: ID!){
+  getPeopleYouMayKnow(id: $id){
+    id
+    email
+    first_name
+    last_name
+    gender
+    dob
+    activated
+    profileImageURL
+    bannerImageURL
+    friend{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    pendingFriend{
+      id
+      first_name
+      last_name
+      profileImageURL
+      pendingFriend{
+        id
+      }
+    }
+    blockedUser{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+    specificFriend{
+      id
+      first_name
+      last_name
+      profileImageURL
+    }
+  }
+}
+`
 
 export const SEND_FRIEND_REQUEST = gql`
 mutation SendFriendRequest($friendID:ID!){
@@ -240,6 +282,12 @@ mutation RejectFriendRequest($friendID:ID!){
 export const BLOCK_USER = gql`
 mutation BlockUser($userID:ID!){
   blockUser(userID: $userID)
+}
+`
+
+export const UNBLOCK_USER = gql`
+mutation UnblockUser($userID:ID!){
+  unblockUser(userID: $userID)
 }
 `
 

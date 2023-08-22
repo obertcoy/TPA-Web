@@ -206,6 +206,18 @@ mutation UnlikePost($postID: ID!){
   }
 `
 
+export const DELETE_POST = gql`
+mutation DeletePost($postID: ID!){
+  deletePost(postID: $postID)
+}
+`
+
+export const SHARE_POST = gql`
+mutation SharePost($postID: ID!, $sharedTo: ID!){
+  sharePost(postID: $postID, sharedTo: $sharedTo)
+}
+`
+
 export const CREATE_COMMENT = gql`
 mutation CreateComment($inputComment: NewComment!, $postID: ID!) {
   createComment(inputComment: $inputComment, postID: $postID) {

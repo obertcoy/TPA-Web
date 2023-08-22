@@ -149,6 +149,84 @@
 
             }
 
+            .non-friend-card {
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+                border-radius: 10px;
+                height: 15rem;
+                box-shadow: var(--default-shadow);
+                border: var(--default-border);
+                background-color: white;
+                cursor: pointer;
+
+                .profile-icon {
+
+                    width: 100%;
+                    height: 80%;
+                    object-fit: cover;
+                    border-radius: 10px 10px 0 0;
+
+                }
+
+                div {
+
+                    display: flex;
+                    flex-direction: column;
+                    // align-items: center;
+                    text-align: start;
+                    width: 80%;
+                    padding-bottom: 5%;
+
+                    h5 {
+                        font-weight: 500;
+                    }
+
+                    h6 {
+                        color: gray;
+                        font-weight: 400;
+                    }
+
+                    .add-friend-btn {
+
+                        display: flex;
+                        align-self: center;
+                        justify-content: center;
+                        background-color: rgba(#1877f2, 0.1);
+                        width: 100%;
+                        gap: 0.5em;
+                        padding: 0.75em;
+                        margin-top: 1em;
+                        color: var(--default-blue-text);
+                        border-radius: var(--default-border-radius);
+
+                    }
+
+                    .add-friend-btn:hover {
+                        background-color: rgba(rgb(96, 136, 206), 0.3);
+
+                    }
+
+                    .remove-btn {
+
+                        display: flex;
+                        align-self: center;
+                        justify-content: center;
+                        background-color: rgba(gray, 0.15);
+                        width: 100%;
+                        gap: 0.5em;
+                        padding: 0.75em;
+                        margin-top: 0.5em;
+                        color: black;
+                        border-radius: var(--default-border-radius);
+
+                    }
+
+                }
+            }
+
         }
 
         .no-request-text {

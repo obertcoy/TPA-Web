@@ -1,21 +1,14 @@
-import style from './css/GroupProfile.module.scss'
+import style from '../css/GroupFullPage.module.scss'
 import { BiChevronDown, BiChevronUp, BiPlus, BiSolidDoorOpen, BiSolidMessageRounded, BiSolidSmile } from 'react-icons/bi'
 import { useState, useEffect, useRef } from 'react'
 import { CgProfile } from 'react-icons/cg'
-import CreatePostModal from './modal/CreatePostModal'
 import { useMutation, useQuery } from '@apollo/client'
-import { GET_GROUP_POST } from '../../query/PostQuery'
-import PostCard from './card/PostCard'
 import { Post } from '../../model/PostModel'
-import { getCurrentUser } from './MasterLayout'
-import PostModal from './modal/PostModal'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { BiSolidChevronDown } from 'react-icons/bi'
 import 'react-toastify/dist/ReactToastify.css';
 import { ChatRoom } from '../../model/ChatModel'
-import { GO_TO_CHATROOM } from '../../query/ChatQuery'
 import { Group, GroupFile, GroupUser } from '../../model/GroupModel'
-import { APPROVE_REQUEST, CHECK_ADMIN_USER, DELETE_GROUP_FILE, EDIT_GROUP_BANNER, GET_ALL_GROUP_FILE, GET_ALL_GROUP_USER, GET_GROUP, KICK_MEMBER, LEAVE_GROUP, PROMOTE_MEMBER, REJECT_REQUEST, UPLOAD_GROUP_FILE } from '../../query/GroupQuery'
 import { HiVideoCamera } from 'react-icons/hi'
 import { IoMdPhotos } from 'react-icons/io'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
@@ -24,20 +17,42 @@ import { v4 } from 'uuid'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import { BsCameraFill } from 'react-icons/bs'
-import { InviteGroupModal } from './modal/InviteGroupModal'
-import { ShowUser, User } from '../../model/UserModel'
 import { AiFillDelete, AiOutlineDownload, AiOutlineSearch } from 'react-icons/ai'
 import { UserName } from '../../helper/UserHelper'
+import CreatePostModal from '../component/modal/CreatePostModal'
+import PostModal from '../component/modal/PostModal'
+import { InviteGroupModal } from '../component/modal/InviteGroupModal'
+import PostCard from '../component/card/PostCard'
+import { ShowUser, User } from '../../model/UserModel'
+import { getCurrentUser } from '../component/MasterLayout'
+import { APPROVE_REQUEST, CHECK_ADMIN_USER, CHECK_INVITE, CHECK_MEMBER, DELETE_GROUP_FILE, EDIT_GROUP_BANNER, GET_ALL_GROUP_FILE, GET_ALL_GROUP_USER, GET_GROUP, KICK_MEMBER, LEAVE_GROUP, PROMOTE_MEMBER, REJECT_REQUEST, REQUEST_JOIN_GROUP, UPLOAD_GROUP_FILE } from '../../query/GroupQuery'
+import { GO_TO_CHATROOM } from '../../query/ChatQuery'
+import { GET_GROUP_POST } from '../../query/PostQuery'
+import { ACCEPT_GROUP_INVITE } from '../../query/UserQuery'
 
-interface GroupProfileProps {
-    groupID: string
-    setSelectedGroupID: (groupID: string) => void
-}
 
-export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfileProps) {
+export default function GroupFullPage() {
+
+    const { groupID } = useParams() || ''
+
+    console.log(groupID);
 
     const user = getCurrentUser()
     const [authorized, setAuthorized] = useState(false)
+    const [isMember, setIsMember] = useState(false)
+    const [isInvited, setIsInvited] = useState(false)
+
+    const { data: checkMember, refetch: refetchCheckMember } = useQuery<{ checkMember: boolean }>(CHECK_MEMBER, {
+        variables: {
+            groupID: groupID
+        }
+    })
+
+    const { data: checkInvite } = useQuery<{ checkInvite: boolean }>(CHECK_INVITE, {
+        variables: {
+            groupID: groupID
+        }
+    })
 
     const { loading, data: groupPageData, refetch: refetchGroup } = useQuery<{ getGroup: Group }>(GET_GROUP, {
         variables: {
@@ -103,6 +118,14 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
         setAuthorized(checkAdmin?.checkAdminUser || false)
     }, [checkAdmin])
 
+    useEffect(() => {
+        setIsMember(checkMember?.checkMember || false)
+    }, [checkMember])
+
+    useEffect(() => {
+        setIsInvited(checkInvite?.checkInvite || false)
+    }, [checkInvite])
+
     const navigate = useNavigate()
 
     const toUserProfile = (userID: string) => {
@@ -128,6 +151,31 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
 
     const [editGroupBanner] = useMutation(EDIT_GROUP_BANNER)
 
+    const [requestJoinGroup] = useMutation(REQUEST_JOIN_GROUP, {
+        variables: {
+            groupID: groupID
+        }
+    })
+
+    const [acceptInvite] = useMutation(ACCEPT_GROUP_INVITE, {
+        variables: {
+            groupID: groupID
+        }
+    })
+
+    const handleRequest = async () => {
+        await requestJoinGroup()
+        refetchCheckMember()
+        toast.success("Request sent")
+    }
+
+    const handleAccept = async () => {
+        await acceptInvite()
+        refetchCheckMember()
+        toast.success("Invite accepted")
+    }
+
+
     // Posts
 
     const handleOpenCreatePost = () => {
@@ -151,7 +199,6 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
 
     const handleLeave = async () => {
         await leaveGroup()
-        setSelectedGroupID('')
         navigate('/main/groups/')
     }
 
@@ -221,7 +268,6 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
         fileInputRef.current?.click();
     };
 
-
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
 
@@ -290,7 +336,7 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
         <>
             {openCreatePost && <CreatePostModal handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} initialGroup={groupPageData?.getGroup as Group} />}
             {openPostModal && postModalID && <PostModal postID={postModalID} handleClosePostModal={handleClosePostModal} />}
-            {openInviteModal && <InviteGroupModal groupID={groupID} handleOpenInviteModal={handleOpenInviteModal} />}
+            {openInviteModal && <InviteGroupModal groupID={groupID || ''} handleOpenInviteModal={handleOpenInviteModal} />}
             <div className={style['page-container']}>
 
                 <div className={style['header-container']}>
@@ -307,10 +353,19 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
 
                             <h2>{groupPageData?.getGroup.name}</h2>
                             <div className={style['button-container']}>
-
-                                <button id={style['invite-btn']} onClick={handleOpenInviteModal}><BiPlus className={style['btn-icon']} />Invite</button>
-                                <button id={style['chat-btn']} onClick={handleMessage}><BiSolidMessageRounded className={style['btn-icon']} />Message</button>
-                                <button id={style['leave-btn']} onClick={handleLeave}><BiSolidDoorOpen />Leave</button>
+                                {isMember ?
+                                    <>
+                                        <button id={style['invite-btn']} onClick={handleOpenInviteModal}><BiPlus className={style['btn-icon']} />Invite</button>
+                                        <button id={style['chat-btn']} onClick={handleMessage}><BiSolidMessageRounded className={style['btn-icon']} />Message</button>
+                                        <button id={style['leave-btn']} onClick={handleLeave}><BiSolidDoorOpen />Leave</button>
+                                    </>
+                                    :
+                                    (isInvited ?
+                                        < button id={style['join-btn']} onClick={handleAccept}>Accept Invite</button>
+                                        :
+                                        < button id={style['join-btn']} onClick={handleRequest}>Request Join</button>
+                                    )
+                                }
                                 <button id={style['know-btn']} onClick={() => setNonFriendOpen(!nonFriendOpen)}><BiSolidChevronDown className={style['btn-icon']} /></button>
                             </div>
                         </div>
@@ -322,17 +377,21 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
                             <div className={activeHeader == 'discussion' ? style['header-title-active'] : ''} onClick={() => handleHeader('discussion')}>
                                 <h5>Discussion</h5>
                             </div>
-                            <div className={activeHeader == 'members' ? style['header-title-active'] : ''} onClick={() => handleHeader('members')}>
-                                <h5>Members</h5>
-                            </div>
-                            <div className={activeHeader == 'files' ? style['header-title-active'] : ''} onClick={() => handleHeader('files')}>
-                                <h5>Files</h5>
-                            </div>
-                            {
-                                authorized &&
-                                <div className={activeHeader == 'requests' ? style['header-title-active'] : ''} onClick={() => handleHeader('requests')}>
-                                    <h5>Requests</h5>
-                                </div>
+                            {isMember &&
+                                <>
+                                    <div className={activeHeader == 'members' ? style['header-title-active'] : ''} onClick={() => handleHeader('members')}>
+                                        <h5>Members</h5>
+                                    </div>
+                                    <div className={activeHeader == 'files' ? style['header-title-active'] : ''} onClick={() => handleHeader('files')}>
+                                        <h5>Files</h5>
+                                    </div>
+                                    {
+                                        authorized &&
+                                        <div className={activeHeader == 'requests' ? style['header-title-active'] : ''} onClick={() => handleHeader('requests')}>
+                                            <h5>Requests</h5>
+                                        </div>
+                                    }
+                                </>
                             }
                         </div>
                     </div>
@@ -344,30 +403,32 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
 
                         <div className={style['posts-container']}>
 
-                            <div className={style['create-post-container']}>
-                                <div className={style['create-post-input']} >
-                                    {user?.profileImageURL ? <img src={user.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
-                                    <button onClick={handleOpenCreatePost}>Write something...</button>
-                                </div>
-                                <hr />
-                                <div className={style['create-post-decor']}>
-                                    <div>
-                                        <HiVideoCamera style={{ color: "red" }} />
-                                        <p>Live Video</p>
+                            {isMember &&
+                                <div className={style['create-post-container']}>
+                                    <div className={style['create-post-input']} >
+                                        {user?.profileImageURL ? <img src={user.profileImageURL} alt="" className={style['profile-icon']} /> : <CgProfile className={style['profile-icon']} />}
+                                        <button onClick={handleOpenCreatePost}>Write something...</button>
                                     </div>
-                                    <div>
-                                        <IoMdPhotos style={{ color: "green" }} />
-                                        <p>Photo/Video</p>
+                                    <hr />
+                                    <div className={style['create-post-decor']}>
+                                        <div>
+                                            <HiVideoCamera style={{ color: "red" }} />
+                                            <p>Live Video</p>
+                                        </div>
+                                        <div>
+                                            <IoMdPhotos style={{ color: "green" }} />
+                                            <p>Photo/Video</p>
+                                        </div>
+                                        <div>
+                                            <BiSolidSmile style={{ color: "yellow" }} />
+                                            <p>Feeling/Activity</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <BiSolidSmile style={{ color: "yellow" }} />
-                                        <p>Feeling/Activity</p>
-                                    </div>
-                                </div>
-                                <hr />
+                                    <hr />
 
-                            </div>
+                                </div>
 
+                            }
                             {
                                 loading ?
                                     <div>
@@ -405,7 +466,7 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
                         <div className={style['member-card-container']}>
                             {groupUserData?.getAllGroupUser ?
                                 groupUserData?.getAllGroupUser.map((data: GroupUser) => (
-                                    <MemberCard key={data.user.id} data={data} toUserProfile={toUserProfile} authorized={authorized} user={user as User} groupID={groupID} handleRefetchGroupUser={handleRefetchGroupUser} />
+                                    <MemberCard key={data.user.id} data={data} toUserProfile={toUserProfile} authorized={authorized} user={user as User} groupID={groupID || ''} handleRefetchGroupUser={handleRefetchGroupUser} />
                                 ))
                                 : <h4 style={{ color: "gray" }}>No members...</h4>
                             }
@@ -457,7 +518,7 @@ export default function GroupProfile({ groupID, setSelectedGroupID }: GroupProfi
                         <div className={style['pending-member-card-container']}>
                             {groupPageData?.getGroup.pendingUser.length ?
                                 groupPageData?.getGroup.pendingUser.map((data: ShowUser) => (
-                                    <PendingMemberCard key={data.id} data={data} toUserProfile={toUserProfile} groupID={groupID} handleRefetchGroup={handleRefetchGroup} />
+                                    <PendingMemberCard key={data.id} data={data} toUserProfile={toUserProfile} groupID={groupID || ''} handleRefetchGroup={handleRefetchGroup} />
                                 ))
                                 : <h4 style={{ color: "gray" }}>No requests...</h4>
                             }

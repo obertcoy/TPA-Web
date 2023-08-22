@@ -1,0 +1,43 @@
+.footer-container{
+
+    display: flex;
+    width: 100%;
+    min-height: 20rem;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    margin-top: auto;
+
+    .footer-content{
+
+        display: flex;
+        flex-direction: column;
+        width: 40%;
+        
+        div{
+
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+            white-space: nowrap;
+
+            a{
+                color: gray;
+                text-decoration: none;
+            }
+
+            h6{
+                color: gray;
+                font-weight: 450;
+                font-size: small;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 768px){
+    .footer-container{
+        display: none;
+    }
+
+}

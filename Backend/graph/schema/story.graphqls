@@ -11,11 +11,11 @@ input NewStory{
 }
 
 extend type Query{
-    getUserStory(userID: ID!): [Story!]!
-    getAllStory: [Story!]!
+    getUserStory(userID: ID!): [Story!]! @auth
+    getAllStory: [Story!]! @auth
 }
 
 extend type Mutation{
-    createStory(inputStory: NewStory!): Story!
-    deleteStory(storyID: ID!): Boolean!
+    createStory(inputStory: NewStory!): Story! @auth
+    deleteStory(storyID: ID!): Boolean! @auth
 }

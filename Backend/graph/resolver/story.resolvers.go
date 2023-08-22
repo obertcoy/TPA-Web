@@ -57,6 +57,9 @@ func (r *queryResolver) GetAllStory(ctx context.Context) ([]*model.Story, error)
 
 	friendID := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", userID)
 
+	deleteTimer := time.Now().Add(-24 * time.Hour)
+	r.Database.Where("created_at < ?", deleteTimer).Delete(&model.Story{})
+
 	return stories, r.Database.Where("user_id IN (?) OR user_id = ?", friendID, userID).Order("created_at DESC").Find(&stories).Error
 }
 

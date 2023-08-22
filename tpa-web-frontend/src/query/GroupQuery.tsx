@@ -160,7 +160,6 @@ export const DELETE_GROUP_FILE = gql`
 mutation DeleteGroupFile($groupID: ID!, $fileID: ID!){
   deleteGroupFile(groupID:$groupID, fileID: $fileID)
 }
-
 `
 
 export const REQUEST_JOIN_GROUP = gql`
@@ -175,10 +174,17 @@ mutation LeaveGroup($groupID: ID!){
 }
 `
 export const CHECK_MEMBER = gql`
-mutation CheckMember($groupID: ID!){
+query CheckMember($groupID: ID!){
   checkMember(groupID: $groupID)
 }
 `
+
+export const CHECK_INVITE= gql`
+query CheckInvite($groupID: ID!){
+  checkInvite(groupID: $groupID)
+}
+`
+
 export const UPLOAD_GROUP_FILE = gql`
 mutation UploadGroupFile($inputGroupFile: NewGroupFile!){
   uploadGroupFile(inputGroupFile: $inputGroupFile){

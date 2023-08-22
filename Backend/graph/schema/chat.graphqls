@@ -12,6 +12,7 @@ type Chat{
     fileURL: String
     createdAt: Time!
     user: User! @goField(forceResolver: true)
+    post: Post @goField(forceResolver: true)
 }
 
 input NewChatRoom{
@@ -23,19 +24,20 @@ input NewChat{
     text: String
     fileURL: String
     chatRoomID: String!
+    postID: ID
 }
 
 extend type Query{
-    getAllChatRoom: [ChatRoom!]
-    getChatRoom(chatRoomID: ID!): ChatRoom!
+    getAllChatRoom: [ChatRoom!] @auth
+    getChatRoom(chatRoomID: ID!): ChatRoom! @auth
 }
 
 type Subscription{
-    getChat(chatRoomID: ID!): [Chat!]
+    getChat(chatRoomID: ID!): [Chat!] @auth
 }
 
 extend type Mutation{
-    createChatRoom(inputChatRoom: NewChatRoom!): ChatRoom!
-    goToChatRoom(inputChatRoom: NewChatRoom!): ChatRoom!
-    createChat(inputChat: NewChat!): Chat!
+    createChatRoom(inputChatRoom: NewChatRoom!): ChatRoom! @auth
+    goToChatRoom(inputChatRoom: NewChatRoom!): ChatRoom! @auth
+    createChat(inputChat: NewChat!): Chat! @auth
 }

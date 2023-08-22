@@ -12,7 +12,7 @@ import { Post } from '../../model/PostModel'
 import { getCurrentUser } from '../component/MasterLayout'
 import PostModal from '../component/modal/PostModal'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ACCEPT_FRIEND_REQUEST, GET_ALL_NON_FRIEND, GET_USER, SEND_FRIEND_REQUEST, UPDATE_BANNER_IMAGE, UPDATE_PROFILE_IMAGE } from '../../query/UserQuery'
+import { ACCEPT_FRIEND_REQUEST, BLOCK_USER, GET_PEOPLE_YOU_MAY_KNOW, GET_USER, SEND_FRIEND_REQUEST, UNBLOCK_USER, UPDATE_BANNER_IMAGE, UPDATE_PROFILE_IMAGE } from '../../query/UserQuery'
 import { ShowUser, User } from '../../model/UserModel'
 import { AiOutlinePlus } from 'react-icons/ai'
 import { BiSolidChevronDown } from 'react-icons/bi'
@@ -26,14 +26,22 @@ import { IoIosSettings } from 'react-icons/io'
 import { GET_USER_REEL } from '../../query/ReelQuery'
 import HomeReelCard from '../component/card/HomeReelCard'
 import { Reel } from '../../model/ReelModel'
-import { MdOutlineMailOutline } from 'react-icons/md'
+import { MdNotifications, MdNotificationsOff, MdOutlineMailOutline } from 'react-icons/md'
 import { ChatRoom } from '../../model/ChatModel'
 import { GO_TO_CHATROOM } from '../../query/ChatQuery'
 
 export default function UserProfilePage() {
 
     const { userID } = useParams()
-    const user = getCurrentUser()
+
+    const currentUser = getCurrentUser()
+
+    const { data: user, refetch: refetchCurrentUser } = useQuery<{ getUser: User }>(GET_USER, {
+        variables: {
+            id: currentUser?.id
+        }
+    })
+
     const [authorized, setAuthorized] = useState(false)
     const { loading, data: userPageData, refetch: refetchUser } = useQuery<{ getUser: User }>(GET_USER, {
         variables: {
@@ -45,7 +53,7 @@ export default function UserProfilePage() {
             userID: userID
         }
     })
-    const { data: nonFriendsData } = useQuery<{ getAllNonFriend: User[] }>(GET_ALL_NON_FRIEND, {
+    const { data: nonFriendsData } = useQuery<{ getPeopleYouMayKnow: User[] }>(GET_PEOPLE_YOU_MAY_KNOW, {
         variables: {
             id: userID
         }
@@ -54,7 +62,7 @@ export default function UserProfilePage() {
     const [goToChatRoom, { data: chatRoomData }] = useMutation<{ goToChatRoom: ChatRoom }>(GO_TO_CHATROOM, {
         variables: {
             inputChatRoom: {
-                userID: [user?.id, userID]
+                userID: [user?.getUser?.id, userID]
             }
         }
     })
@@ -104,6 +112,8 @@ export default function UserProfilePage() {
 
     const [updateBannerImage] = useMutation(UPDATE_BANNER_IMAGE)
     const [updateProfileImage] = useMutation(UPDATE_PROFILE_IMAGE)
+    const [blockUser] = useMutation(BLOCK_USER)
+    const [unblockUser] = useMutation(UNBLOCK_USER)
 
     const [activeHeader, setActiveHeader] = useState('posts')
     const [nonFriendOpen, setNonFriendOpen] = useState(false)
@@ -119,7 +129,7 @@ export default function UserProfilePage() {
     }
 
     useEffect(() => {
-        if (userID == user?.id) {
+        if (userID == user?.getUser.id) {
             setAuthorized(true)
         } else {
             setAuthorized(false)
@@ -128,6 +138,26 @@ export default function UserProfilePage() {
 
     const handleHeader = (header: string) => {
         setActiveHeader(header)
+    }
+
+    const handleBlockUser = async () => {
+        await blockUser({
+            variables: {
+                userID: userPageData?.getUser.id
+            }
+        })
+        toast.success('User notification blocked')
+        refetchCurrentUser()
+    }
+
+    const handleUnblockUser = async () => {
+        await unblockUser({
+            variables: {
+                userID: userPageData?.getUser.id
+            }
+        })
+        toast.success('User unblocked')
+        refetchCurrentUser()
     }
 
     // Posts
@@ -232,11 +262,9 @@ export default function UserProfilePage() {
         navigate(`/main/reels/`)
     }
 
-    console.log(user);
-    
     return (
         <>
-            {openCreatePost && <CreatePostModal handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} />}
+            {openCreatePost && <CreatePostModal initialGroup={null} handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} />}
             {openPostModal && postModalID && <PostModal postID={postModalID} handleClosePostModal={handleClosePostModal} />}
 
             <div className={style['page-container']}>
@@ -268,18 +296,28 @@ export default function UserProfilePage() {
                                     <button id={style['story-btn']} onClick={() => navigate('/main/create-story/select')}><AiOutlinePlus className={style['btn-icon']} /> Add to story</button>
                                 }
                                 {
-                                    (!user?.pendingFriend?.some(pending => pending.id == userID) &&
-                                        !user?.friend?.some(friend => friend.id == userID) &&
-                                        user?.id != userID) && 
-                                        !userPageData?.getUser?.pendingFriend?.some(pending => pending.id == user?.id) &&
-                                        (
+                                    (!user?.getUser.pendingFriend?.some(pending => pending.id == userID) &&
+                                        !user?.getUser.friend?.some(friend => friend.id == userID) &&
+                                        user?.getUser.id != userID) &&
+                                    !userPageData?.getUser?.pendingFriend?.some(pending => pending.id == user?.getUser.id) &&
+                                    (
                                         <button id={style['add-btn']} onClick={addFriend}>
                                             <BsFillPersonPlusFill className={style['btn-icon-white']} />Add Friend
                                         </button>)
                                 }
                                 {
-                                    user?.pendingFriend?.some(pending => pending.id == userID) &&
+                                    user?.getUser.pendingFriend?.some(pending => pending.id == userID) &&
                                     <button id={style['confirm-btn']} onClick={acceptFriend}>Confirm Request</button>
+                                }
+                                {
+                                    userPageData?.getUser.id != user?.getUser.id &&
+                                    (
+                                        user?.getUser.blockedUser.some(user => user.id == userPageData?.getUser.id)
+                                            ?
+                                            <button id={style['unblock-btn']} onClick={handleUnblockUser}><MdNotifications className={style['btn-icon']} />Unblock</button>
+                                            :
+                                            <button id={style['block-btn']} onClick={handleBlockUser}><MdNotificationsOff className={style['btn-icon']} />Block</button>
+                                    )
                                 }
                                 <button id={style['chat-btn']} onClick={handleMessage}><BiSolidMessageRounded className={style['btn-icon']} />Message</button>
                                 <button id={style['know-btn']} onClick={() => setNonFriendOpen(!nonFriendOpen)}><BiSolidChevronDown className={style['btn-icon']} /></button>
@@ -288,7 +326,7 @@ export default function UserProfilePage() {
                         <div className={style['non-friend-container']} style={nonFriendOpen ? { display: "flex" } : { display: "none" }}>
                             <h4>People you may know</h4>
                             <div className={style['non-friend-card-container']}>
-                                {nonFriendsData?.getAllNonFriend.map((data: User) => (
+                                {nonFriendsData?.getPeopleYouMayKnow.map((data: User) => (
                                     <NonFriendCard key={data.id} data={data} userPageData={userPageData?.getUser} toUserProfile={toUserProfile} />
                                 ))}
                             </div>
@@ -474,7 +512,7 @@ function NonFriendCard({ data, userPageData, toUserProfile }: NonFriendCardProps
         }
     })
 
-    const [isAdd, setIsAdd] = useState(data.pendingFriend.some(user => user.id === userPageData?.id))
+    const [isAdd, setIsAdd] = useState(data?.pendingFriend.some(user => user.id === userPageData?.id))
 
     const handleSendFriendRequest = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.stopPropagation()

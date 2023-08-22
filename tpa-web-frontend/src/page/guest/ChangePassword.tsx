@@ -11,7 +11,7 @@ export default function ChangePasswordPage() {
 
     const { forgotToken } = useParams();
     const [verifyToken, { error: verifyError }] = useMutation(VERIFY_CHANGE_PASSWORD_TOKEN);
-    const [changePassword, { error: changePasswordError }] = useMutation(CHANGE_PASSWORD)
+    const [changePassword, { data: changePasswordData }] = useMutation(CHANGE_PASSWORD)
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
 
@@ -27,40 +27,42 @@ export default function ChangePasswordPage() {
 
         if (verifyError) {
             toast.error('Token invalid')
-            navigate('/login')
+            setTimeout(() => {
+                navigate('/login')
+            }, 3000);
         }
 
     }, [forgotToken]);
+
+
 
     const toLogin = () => {
         localStorage.removeItem('changeEmailPassword')
         navigate('/login')
     }
 
-    const handleChange = () => {
+    const handleChange = async () => {
         if (password == '' || confirmPassword == '') {
             toast.error('Field must be filled')
         } else if (password != confirmPassword) {
             toast.error('Password and confirm password must match')
         } else {
-            changePassword({
+            await changePassword({
                 variables: {
                     email: localStorage.getItem('changeEmailPassword'),
                     newPassword: password
                 }
             })
-
+            if (changePasswordData.changePassword) {
+                toast.success('Password changed successfuly!')
+                setTimeout(() => {
+                    navigate('/login')
+                }, 3000);
+            } else if(!changePasswordData.changePassword) {
+                toast.error('Password changed failed')
+            }
         }
     }
-
-    useEffect(() => {
-        if (!changePasswordError) {
-            navigate('/login')
-            toast.success('Password changed successfuly!')
-        } else {
-            toast.error('Password changed failed')
-        }
-    }, [changePassword])
 
     return (
         <div className={style['page-container']}>

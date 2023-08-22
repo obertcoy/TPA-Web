@@ -45,6 +45,19 @@
                     font-weight: 400;
                 }
             }
+
+            #delete-btn{
+
+                color: #FF3C28;
+                padding: 0.5rem 1rem;
+                margin-left: auto;
+                background-color: var(--default-bg);
+            }
+
+            #delete-btn:hover{
+
+                background-color: var(--default-bg-hover);
+            }
         }
 
         .card-content-text {

@@ -21,23 +21,29 @@ import FriendsNavbar from './page/component/FriendsNavbar'
 import ChatsPage from './page/main/ChatsPage'
 import GroupsPage from './page/main/GroupsPage'
 import NotificationsPage from './page/main/NotificationsPage'
+import GroupFullPage from './page/main/GroupFullPage'
+import MiddlewareMain from './page/middleware/MiddlewareMain'
+import MiddlewareLogin from './page/middleware/MiddlewareLogin'
+import SearchPage from './page/main/SearchPage'
 
 function AuthenticatedRoutes() {
   return (
     <MasterLayout>
       <Routes>
-        <Route path='home' element={<HomePage />}></Route>
-        <Route path='friends' element={<FriendsPage />}></Route>
-        <Route path='create-story/*' element={<CreateStoryRoutes />} />
-        <Route path='stories/*' element={<StoryPageRoute />}></Route>
-        <Route path='reels/' element={<ReelPage />}></Route>
-        <Route path='create-reel' element={<CreateReelPage />}></Route>
-        <Route path='profile/:userID' element={<UserProfilePage />}></Route>
-        <Route path='all-friends/*' element={<FriendsNavbar />}></Route>
-        <Route path='chats/' element={<ChatsPage />}></Route>
-        <Route path='chats/:paramChatRoomID' element={<ChatsPage />}></Route>
-        <Route path='groups/' element={<GroupsPage />}></Route>
-        <Route path='notifications/' element={<NotificationsPage/>}></Route>
+        <Route path='home' element={<MiddlewareMain> <HomePage /></MiddlewareMain>}></Route>
+        <Route path='friends' element={<MiddlewareMain> <FriendsPage /> </MiddlewareMain>}></Route>
+        <Route path='create-story/*' element={<MiddlewareMain> <CreateStoryRoutes /> </MiddlewareMain>} />
+        <Route path='stories/*' element={<MiddlewareMain> <StoryPageRoute /> </MiddlewareMain>}></Route>
+        <Route path='reels/' element={<MiddlewareMain> <ReelPage /> </MiddlewareMain>}></Route>
+        <Route path='create-reel' element={<MiddlewareMain> <CreateReelPage /> </MiddlewareMain>}></Route>
+        <Route path='profile/:userID' element={<MiddlewareMain> <UserProfilePage /> </MiddlewareMain>}></Route>
+        <Route path='all-friends/*' element={<MiddlewareMain> <FriendsNavbar /> </MiddlewareMain>}></Route>
+        <Route path='chats/' element={<MiddlewareMain> <ChatsPage /> </MiddlewareMain>}></Route>
+        <Route path='chats/:paramChatRoomID' element={<MiddlewareMain> <ChatsPage /> </MiddlewareMain>}></Route>
+        <Route path='groups/' element={<MiddlewareMain> <GroupsPage /> </MiddlewareMain>}></Route>
+        <Route path='groups/:groupID' element={<MiddlewareMain> <GroupFullPage /> </MiddlewareMain>}></Route>
+        <Route path='notifications/' element={<MiddlewareMain> <NotificationsPage/> </MiddlewareMain>}></Route>
+        <Route path='search/:search' element={<MiddlewareMain> <SearchPage/> </MiddlewareMain>}></Route>
       </Routes>
     </MasterLayout>
   );
@@ -79,7 +85,7 @@ function PublicRoutes() {
   return (
     <GetApolloProvider token={token}>
       <Routes>
-        <Route path='/login' element={<LoginPage />}></Route>
+        <Route path='/login' element={<MiddlewareLogin> <LoginPage /> </MiddlewareLogin>}></Route>
         <Route path='/register' element={<RegisterPage />}></Route>
         <Route path='/forgot' element={<ForgotPage />}></Route>
         <Route path='/activate/:activateToken' element={<ActivatePage />}></Route>

@@ -8,17 +8,18 @@ type Notification {
 }
 
 input NewNotification {
-  userID: String!
+  userID: String! 
   text: String!
 }
 
 extend type Query {
-  getAllNotification: [Notification!]!
-  getUserNotification: [Notification!]!
+  getAllNotification: [Notification!]! @auth
+  getUserNotification: [Notification!]! @auth
+  getUserNotificationLength: Int! @auth
 }
 
 extend type Mutation {
-  createNotification(inputNotification: NewNotification): Boolean!
-  deleteNotification(notificationID: ID!): Boolean!
-  readNotification(notificationID: ID!): Boolean!
+  createNotification(inputNotification: NewNotification): Boolean! @auth
+  deleteNotification(notificationID: ID!): Boolean! @auth
+  readNotification(notificationID: ID!): Boolean! @auth
 }

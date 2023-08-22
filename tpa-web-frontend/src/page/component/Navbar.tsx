@@ -15,6 +15,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { GrClose } from 'react-icons/gr'
 import { UserName } from '../../helper/UserHelper'
 import { IoIosClose } from 'react-icons/io'
+import { GET_USER_NOTIFICATION_LENGTH } from '../../query/NotificationQuery'
 
 
 export default function Navbar() {
@@ -23,6 +24,8 @@ export default function Navbar() {
     const [profileOpen, setProfileOpen] = useState(false)
     const [search, setSearch] = useState('')
     const navigate = useNavigate()
+
+    const { data: notificationLength } = useQuery<{ getUserNotificationLength: number }>(GET_USER_NOTIFICATION_LENGTH)
 
     const handleNav = (page: string) => {
         setActivePage(page)
@@ -65,6 +68,7 @@ export default function Navbar() {
         }
     };
 
+    
     return (
         <div className={style['container']}>
 
@@ -97,8 +101,11 @@ export default function Navbar() {
                     <div>
                         <FaFacebookMessenger className={style['right-icon']} onClick={toChatPage}/>
                     </div>
-                    <div>
+                    <div style={{position:'relative'}}>
                         <MdNotifications className={style['right-icon']} onClick={toNotificationPage}/>
+                        <div className={style['notif-number']}>
+                            <h6>{notificationLength?.getUserNotificationLength}</h6>
+                        </div>
                     </div>
 
                     {user?.profileImageURL ? <img src={user?.profileImageURL} alt="" className={style['profile-icon']} onClick={handleOpenProfileCard} /> : <CgProfile className={style['profile-icon']} onClick={handleOpenProfileCard} />}
