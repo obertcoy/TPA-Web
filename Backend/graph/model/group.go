@@ -16,7 +16,7 @@ type Group struct {
 type UserGroupRole struct {
 	UserID  string   `gorm:"primaryKey"`
 	GroupID string `gorm:"primaryKey"`
-	Role    string `json:"role"`
+	Role    string `json:"role" gorm:"default:Member"`
 }
 
 

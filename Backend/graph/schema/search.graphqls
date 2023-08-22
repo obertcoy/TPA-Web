@@ -1,0 +1,9 @@
+type SearchResult {
+    users: [User]
+    posts: [Post]
+    groups: [Group]
+}
+
+extend type Query{
+    getSearchResult(search: String!): SearchResult! @auth
+}

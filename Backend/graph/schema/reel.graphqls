@@ -31,18 +31,18 @@ input NewReelComment{
 }
 
 extend type Query {
-  getUserReel(userID: ID!): [Reel!]!
-  getAllReel: [Reel!]!
-  getReel(reelID: ID!): Reel!
+  getUserReel(userID: ID!): [Reel!]! @auth
+  getAllReel: [Reel!]! @auth
+  getReel(reelID: ID!): Reel! @auth
 }
 
 extend type Mutation {
-  createReel(inputReel: NewReel!): Reel!
-  deleteReel(reelID: ID!): Boolean!
-  createReelComment(inputReelComment: NewReelComment!, reelID: ID!): ReelComment!
+  createReel(inputReel: NewReel!): Reel! @auth
+  deleteReel(reelID: ID!): Boolean! @auth
+  createReelComment(inputReelComment: NewReelComment!, reelID: ID!): ReelComment! @auth
   likeReel(reelID: ID!): Boolean! @auth
   unlikeReel(reelID: ID!): Boolean! @auth
-  likeReelComment(reelCommentID: ID!): Boolean!
-  unlikeReelComment(reelCommentID: ID!): Boolean!
+  likeReelComment(reelCommentID: ID!): Boolean! @auth
+  unlikeReelComment(reelCommentID: ID!): Boolean! @auth
   shareReel(reelID: ID!, sharedTo: ID!): Boolean! @auth
 }

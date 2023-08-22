@@ -20,6 +20,7 @@ type NewChat struct {
 	Text       *string `json:"text,omitempty"`
 	FileURL    *string `json:"fileURL,omitempty"`
 	ChatRoomID string  `json:"chatRoomID"`
+	PostID     *string `json:"postID,omitempty"`
 }
 
 type NewChatRoom struct {

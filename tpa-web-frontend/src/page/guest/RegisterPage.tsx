@@ -5,6 +5,7 @@ import { CREATE_USER } from '../../query/UserQuery'
 import { useMutation } from '@apollo/client';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Footer from '../component/Footer';
 
 export default function RegisterPage() {
 
@@ -25,6 +26,22 @@ export default function RegisterPage() {
 
     const handleSignUp = () => {
         if (firstName != '' && lastName != '' && email != '' && password != '' && gender != '' && dob) {
+
+            if (!email.endsWith('@gmail.com')) {
+                toast.error('Email must ends with @gmail.com')
+                return
+            }
+            if (password.length < 5) {
+                toast.error('Password length must be more than 5 characters')
+                return
+            }
+            const currentDate = new Date();
+            const userDOB = new Date(dob);
+            const ageDiff = currentDate.getFullYear() - userDOB.getFullYear();
+            if (ageDiff < 8) {
+                toast.error("You must be at least 8 years old to sign up.");
+                return;
+            }
             createUser({
                 variables: {
                     inputUser: {

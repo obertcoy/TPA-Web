@@ -129,6 +129,11 @@ func (r *mutationResolver) CreateComment(ctx context.Context, inputComment model
 		return nil, userErr
 	}
 
+	post, err := service.GetPost(ctx, postID)
+	if err != nil {
+		return nil, err
+	}
+
 	var parentID *string = nil
 
 	if inputComment.ParentID != nil {
@@ -148,7 +153,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, inputComment model
 
 		notificationText := fmt.Sprintf("%s %s commented on your post.", user.FirstName, user.LastName)
 		notificationInput := &model.NewNotification{
-			UserID: comment.UserID,
+			UserID: post.UserID,
 			Text:   notificationText,
 		}
 		_, notifErr := r.CreateNotification(ctx, notificationInput)
@@ -157,9 +162,9 @@ func (r *mutationResolver) CreateComment(ctx context.Context, inputComment model
 		}
 
 	} else {
-		notificationText := fmt.Sprintf("%s %s replied to your comment.", user.FirstName, user.LastName)
+		notificationText := fmt.Sprintf("%s %s replied to a comment on your post.", user.FirstName, user.LastName)
 		notificationInput := &model.NewNotification{
-			UserID: comment.UserID,
+			UserID: post.UserID,
 			Text:   notificationText,
 		}
 		_, notifErr := r.CreateNotification(ctx, notificationInput)
@@ -225,6 +230,18 @@ func (r *mutationResolver) LikeComment(ctx context.Context, commentID string) (b
 	}
 
 	comment.LikedBy = append(comment.LikedBy, user)
+
+	notificationText := fmt.Sprintf("%s %s like your comment on a post.", user.FirstName, user.LastName)
+	notificationInput := &model.NewNotification{
+		UserID: comment.UserID,
+		Text:   notificationText,
+	}
+
+	_, notifErr := r.CreateNotification(ctx, notificationInput)
+	if notifErr != nil {
+		return false, notifErr
+	}
+
 	return true, r.Database.Save(&comment).Error
 }
 
@@ -247,12 +264,66 @@ func (r *mutationResolver) UnlikeComment(ctx context.Context, commentID string) 
 
 // SharePost is the resolver for the sharePost field.
 func (r *mutationResolver) SharePost(ctx context.Context, postID string, sharedTo string) (bool, error) {
-	panic(fmt.Errorf("not implemented: SharePost - sharePost"))
+	userID := ctx.Value("TokenHeader").(string)
+	user, err := service.GetUser(ctx, userID)
+
+	_, err = service.GetUser(ctx, sharedTo)
+	if err != nil {
+		return false, err
+	}
+	post, _ := service.GetPost(ctx, postID)
+
+	if post == nil {
+		return false, gqlerror.Errorf("Error share post")
+	}
+
+	var users []string
+	users = append(users, userID, sharedTo)
+
+	userChatRoom := &model.NewChatRoom{
+		UserID:  users,
+		GroupID: nil,
+	}
+
+	chatRoom, err := r.GoToChatRoom(ctx, *userChatRoom)
+	if err != nil {
+		return false, err
+	}
+
+	inputChat := &model.NewChat{
+		ChatRoomID: chatRoom.ID,
+		PostID:     &postID,
+	}
+
+	_, err = r.CreateChat(ctx, *inputChat)
+	if err != nil {
+		return false, err
+	}
+
+	post.SharedBy = append(post.SharedBy, user)
+
+	notificationText := fmt.Sprintf("%s %s shared your post.", user.FirstName, user.LastName)
+	notificationInput := &model.NewNotification{
+		UserID: sharedTo,
+		Text:   notificationText,
+	}
+
+	_, notifErr := r.CreateNotification(ctx, notificationInput)
+	if notifErr != nil {
+		return false, notifErr
+	}
+
+	return true, r.Database.Save(&post).Error
 }
 
 // DeletePost is the resolver for the deletePost field.
 func (r *mutationResolver) DeletePost(ctx context.Context, postID string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeletePost - deletePost"))
+	post, err := service.GetPost(ctx, postID)
+	if err != nil {
+		return false, err
+	}
+
+	return true, r.Database.Delete(&post).Error
 }
 
 // User is the resolver for the user field.

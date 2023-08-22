@@ -6,6 +6,7 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -31,7 +32,6 @@ func (r *groupUserResolver) User(ctx context.Context, obj *model.GroupUser) (*mo
 
 // UploadGroupFile is the resolver for the uploadGroupFile field.
 func (r *mutationResolver) UploadGroupFile(ctx context.Context, inputGroupFile model.NewGroupFile) (*model.GroupFile, error) {
-	
 	userID := ctx.Value("TokenHeader").(string)
 
 	group, err := service.GetGroup(ctx, inputGroupFile.GroupID)
@@ -127,6 +127,12 @@ func (r *mutationResolver) PromoteMember(ctx context.Context, groupID string, us
 
 // ApproveRequest is the resolver for the approveRequest field.
 func (r *mutationResolver) ApproveRequest(ctx context.Context, groupID string, userID string) (bool, error) {
+	adminID := ctx.Value("TokenHeader").(string)
+	admin, err := service.GetUser(ctx, adminID)
+	if err != nil {
+		return false, err
+	}
+
 	user, userErr := service.GetUser(ctx, userID)
 
 	if userErr != nil {
@@ -147,17 +153,17 @@ func (r *mutationResolver) ApproveRequest(ctx context.Context, groupID string, u
 		Role:    "Member",
 	}
 
-	err := r.Database.Save(&group).Error
+	err = r.Database.Save(group).Error
 	if err != nil {
 		return false, err
 	}
 
-	err = r.Database.Save(&userRole).Error
+	err = r.Database.Save(userRole).Error
 	if err != nil {
 		return false, err
 	}
 
-	err = r.Database.Model(&group).Association("PendingUser").Delete(&user)
+	err = r.Database.Model(&group).Association("PendingUser").Delete(user)
 	if err != nil {
 		return false, err
 	}
@@ -165,6 +171,17 @@ func (r *mutationResolver) ApproveRequest(ctx context.Context, groupID string, u
 	_, err = service.AddUserToGroupChat(ctx, userID, groupID)
 	if err != nil {
 		return false, err
+	}
+
+	notificationText := fmt.Sprintf("%s %s approve your request to join %s.", admin.FirstName, admin.LastName, group.Name)
+	notificationInput := &model.NewNotification{
+		UserID: userID,
+		Text:   notificationText,
+	}
+
+	_, notifErr := r.CreateNotification(ctx, notificationInput)
+	if notifErr != nil {
+		return false, notifErr
 	}
 
 	return true, nil
@@ -187,6 +204,23 @@ func (r *mutationResolver) RejectRequest(ctx context.Context, groupID string, us
 	err := r.Database.Model(&group).Association("PendingUser").Delete(&user)
 	if err != nil {
 		return false, err
+	}
+
+	adminID := ctx.Value("TokenHeader").(string)
+	admin, err := service.GetUser(ctx, adminID)
+	if err != nil {
+		return false, err
+	}
+
+	notificationText := fmt.Sprintf("%s %s reject your request to join %s.", admin.FirstName, admin.LastName, group.Name)
+	notificationInput := &model.NewNotification{
+		UserID: userID,
+		Text:   notificationText,
+	}
+
+	_, notifErr := r.CreateNotification(ctx, notificationInput)
+	if notifErr != nil {
+		return false, notifErr
 	}
 
 	return true, nil
@@ -216,6 +250,17 @@ func (r *mutationResolver) KickMember(ctx context.Context, groupID string, userI
 
 	if err != nil {
 		return false, err
+	}
+
+	notificationText := fmt.Sprintf("You are kicked from %s.", group.Name)
+	notificationInput := &model.NewNotification{
+		UserID: userID,
+		Text:   notificationText,
+	}
+
+	_, notifErr := r.CreateNotification(ctx, notificationInput)
+	if notifErr != nil {
+		return false, notifErr
 	}
 
 	return true, nil
@@ -320,18 +365,6 @@ func (r *mutationResolver) LeaveGroup(ctx context.Context, groupID string) (bool
 	return true, nil
 }
 
-// CheckMember is the resolver for the checkMember field.
-func (r *mutationResolver) CheckMember(ctx context.Context, groupID string) (bool, error) {
-	userID := ctx.Value("TokenHeader").(string)
-	err := r.Database.Table("user_group_roles").Select("user_id").Where("group_id = ? AND user_id = ?", groupID, userID).Error
-
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
-}
-
 // GetAllUserGroup is the resolver for the getAllUserGroup field.
 func (r *queryResolver) GetAllUserGroup(ctx context.Context) ([]*model.Group, error) {
 	userID := ctx.Value("TokenHeader").(string)
@@ -398,6 +431,41 @@ func (r *queryResolver) GetNonMemberUser(ctx context.Context, groupID string) ([
 	userSubquery := r.Database.Table("user_group_roles").Select("user_id").Where("group_id = ?", groupID)
 	friendSubquery := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", userID)
 	return users, r.Database.Where("id NOT IN (?) AND id IN (?)", userSubquery, friendSubquery).Preload("Friend").Preload("PendingFriend").Preload("BlockedUser").Preload("SpecificFriend").Preload("GroupInvite").Find(&users).Error
+}
+
+// CheckMember is the resolver for the checkMember field.
+func (r *queryResolver) CheckMember(ctx context.Context, groupID string) (bool, error) {
+	userID := ctx.Value("TokenHeader").(string)
+
+	userRole := &model.UserGroupRole{
+		UserID:  userID,
+		GroupID: groupID,
+	}
+
+	err := r.Database.Table("user_group_roles").Where("group_id = ?", groupID).First(&userRole).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// CheckInvite is the resolver for the checkInvite field.
+func (r *queryResolver) CheckInvite(ctx context.Context, groupID string) (bool, error) {
+	userID := ctx.Value("TokenHeader").(string)
+	user, err := service.GetUser(ctx, userID)
+	if err != nil {
+		return false, err
+	}
+
+	for _, invite := range user.GroupInvite {
+		if invite.ID == groupID {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 // Group returns graph.GroupResolver implementation.

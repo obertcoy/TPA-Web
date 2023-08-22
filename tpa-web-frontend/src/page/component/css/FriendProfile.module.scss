@@ -141,6 +141,14 @@ $banner-height: 40vh;
                         font-weight: 500;
                     }
 
+                    #unblock-btn{
+                        background-color: var(--default-blue-text);
+                    }
+
+                    #block-btn{
+                        background-color: var(--default-bg-red);
+                    }
+
                 }
 
             }

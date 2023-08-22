@@ -23,6 +23,12 @@ query GetUserNotification{
 }
 `
 
+export const GET_USER_NOTIFICATION_LENGTH = gql`
+query GetUserNotificationLength{
+  getUserNotificationLength
+}
+`
+
 export const READ_NOTIFICATION = gql`
 mutation ReadNotification($notificationID: ID!){
   readNotification(notificationID: $notificationID)

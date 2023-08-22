@@ -68,8 +68,8 @@ export default function CreatePhotoStoryPage() {
     };
 
     const handleIconClick = () => {
-        fileInputRef.current?.click();
-    };
+        fileInputRef.current?.click()
+    }
 
 
     const [createStory, { error }] = useMutation(CREATE_STORY)

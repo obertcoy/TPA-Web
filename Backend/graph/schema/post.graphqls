@@ -42,21 +42,21 @@ input NewComment{
 }
 
 extend type Query{
-    getAllPost: [Post!]! 
+    getAllPost: [Post!]! @auth
     getPost(id: ID!): Post! @auth
-    getComment(id: ID!): Comment!
-    getUserPost: [Post!]!
-    getAllPostDebug: [Post!]!
-    getGroupPost(groupID: ID!): [Post!]
+    getComment(id: ID!): Comment! @auth
+    getUserPost: [Post!]! @auth
+    getAllPostDebug: [Post!]! @auth
+    getGroupPost(groupID: ID!): [Post!] @auth
 }
 
 extend type Mutation{
-    createPost(inputPost: NewPost!) : Post! 
-    createComment(inputComment: NewComment!, postID: ID!) : Comment! 
+    createPost(inputPost: NewPost!) : Post! @auth
+    createComment(inputComment: NewComment!, postID: ID!) : Comment! @auth
     likePost(postID: ID!) : Boolean! @auth
     unlikePost(postID: ID!) : Boolean! @auth
-    likeComment(commentID: ID!) : Boolean! 
-    unlikeComment(commentID: ID!) : Boolean! 
+    likeComment(commentID: ID!) : Boolean! @auth
+    unlikeComment(commentID: ID!) : Boolean! @auth
     sharePost(postID: ID!, sharedTo: ID!): Boolean! @auth
-    deletePost(postID: ID!): Boolean!
+    deletePost(postID: ID!): Boolean! @auth
 }

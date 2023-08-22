@@ -11,7 +11,7 @@ import { Post } from '../../model/PostModel'
 import { getCurrentUser } from './MasterLayout'
 import PostModal from './modal/PostModal'
 import { useNavigate } from 'react-router-dom'
-import { GET_ALL_NON_FRIEND, GET_USER, SEND_FRIEND_REQUEST } from '../../query/UserQuery'
+import { BLOCK_USER, GET_PEOPLE_YOU_MAY_KNOW, GET_USER, SEND_FRIEND_REQUEST, UNBLOCK_USER } from '../../query/UserQuery'
 import { ShowUser, User } from '../../model/UserModel'
 import { BiSolidChevronDown } from 'react-icons/bi'
 import { BsFillCalendarDateFill, BsGenderFemale, BsGenderMale, BsList } from 'react-icons/bs'
@@ -19,9 +19,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { GET_USER_REEL } from '../../query/ReelQuery'
 import HomeReelCard from './card/HomeReelCard'
 import { Reel } from '../../model/ReelModel'
-import { MdFilterList, MdOutlineMailOutline } from 'react-icons/md'
+import { MdFilterList, MdNotifications, MdNotificationsOff, MdOutlineMailOutline } from 'react-icons/md'
 import { ChatRoom } from '../../model/ChatModel'
 import { GO_TO_CHATROOM } from '../../query/ChatQuery'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 interface FriendProfileProps {
     userID: string
@@ -29,7 +31,13 @@ interface FriendProfileProps {
 
 export default function FriendProfile({ userID }: FriendProfileProps) {
 
-    const user = getCurrentUser()
+    const currentUser = getCurrentUser()
+
+    const {data: user, refetch: refetchCurrentUser} = useQuery<{ getUser: User }>(GET_USER, {
+        variables: {
+            id: currentUser?.id
+        }
+    })
 
     const { loading, data: userPageData } = useQuery<{ getUser: User }>(GET_USER, {
         variables: {
@@ -41,7 +49,7 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
             userID: userID
         }
     })
-    const { data: nonFriendsData } = useQuery<{ getAllNonFriend: User[] }>(GET_ALL_NON_FRIEND, {
+    const { data: nonFriendsData } = useQuery<{ getPeopleYouMayKnow: User[] }>(GET_PEOPLE_YOU_MAY_KNOW, {
         variables: {
             id: userID
         }
@@ -50,7 +58,8 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
     const [goToChatRoom, { data: chatRoomData }] = useMutation<{ goToChatRoom: ChatRoom }>(GO_TO_CHATROOM, {
         variables: {
             inputChatRoom: {
-                userID: [user?.id, userID]
+                userID: [user?.getUser.id, userID],
+                groupID: null
             }
         }
     })
@@ -62,6 +71,9 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
     const [openCreatePost, setOpenCreatePost] = useState(false)
     const [openPostModal, setOpenPostModal] = useState(false)
 
+    const [blockUser] = useMutation(BLOCK_USER)
+    const [unblockUser] = useMutation(UNBLOCK_USER)
+
     const navigate = useNavigate()
 
     const toUserProfile = (userID: string) => {
@@ -70,6 +82,26 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
 
     const handleHeader = (header: string) => {
         setActiveHeader(header)
+    }
+
+    const handleBlockUser = async () => {
+        await blockUser({
+            variables: {
+                userID: userPageData?.getUser.id
+            }
+        })
+        toast.success('User notification blocked')
+        refetchCurrentUser()
+    }
+
+    const handleUnblockUser = async () => {
+        await unblockUser({
+            variables: {
+                userID: userPageData?.getUser.id
+            }
+        })
+        toast.success('User unblocked')
+        refetchCurrentUser()
     }
 
     // Posts
@@ -117,9 +149,12 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
         navigate(`/main/reels/`)
     }
 
+    console.log(user);
+    
+
     return (
         <>
-            {openCreatePost && <CreatePostModal handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} initialGroup={null}/>}
+            {openCreatePost && <CreatePostModal handleOpenCreatePost={handleOpenCreatePost} refetchGetAllPost={refetchGetAllPost} initialGroup={null} />}
             {openPostModal && postModalID && <PostModal postID={postModalID} handleClosePostModal={handleClosePostModal} />}
 
             <div className={style['page-container']}>
@@ -140,6 +175,13 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
                                 <h5>{userPageData?.getUser.friend?.length || 0} friends</h5>
                             </div>
                             <div className={style['button-container']}>
+                                {
+                                    user?.getUser.blockedUser.some(user => user.id == userPageData?.getUser.id)
+                                    ?
+                                    <button id={style['unblock-btn']} onClick={handleUnblockUser}><MdNotifications className={style['btn-icon']} />Unblock</button>
+                                    :
+                                    <button id={style['block-btn']} onClick={handleBlockUser}><MdNotificationsOff className={style['btn-icon']} />Block</button>
+                                }
                                 <button id={style['chat-btn']} onClick={handleMessage}><BiSolidMessageRounded className={style['btn-icon']} />Message</button>
                                 <button id={style['know-btn']} onClick={() => setNonFriendOpen(!nonFriendOpen)}><BiSolidChevronDown className={style['btn-icon']} /></button>
                             </div>
@@ -147,7 +189,7 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
                         <div className={style['non-friend-container']} style={nonFriendOpen ? { display: "flex" } : { display: "none" }}>
                             <h4>People you may know</h4>
                             <div className={style['non-friend-card-container']}>
-                                {nonFriendsData?.getAllNonFriend.map((data: User) => (
+                                {nonFriendsData?.getPeopleYouMayKnow.map((data: User) => (
                                     <NonFriendCard key={data.id} data={data} userPageData={userPageData?.getUser} toUserProfile={toUserProfile} />
                                 ))}
                             </div>
@@ -262,6 +304,16 @@ export default function FriendProfile({ userID }: FriendProfileProps) {
                     </div>
                 }
             </div >
+            <ToastContainer position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored" />
         </>
     )
 }

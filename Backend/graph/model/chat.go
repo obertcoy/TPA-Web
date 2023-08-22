@@ -10,6 +10,8 @@ type Chat struct {
 	User       *User     `json:"user" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	UserID     string    `json:"userID"`
 	ChatRoomID string    `json:"chatRoomID"`
+	Post       *Post     `json:"post,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	PostID     *string   `json:"postID,omitempty"`
 }
 
 type ChatRoom struct {

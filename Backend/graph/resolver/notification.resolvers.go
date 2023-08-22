@@ -77,7 +77,21 @@ func (r *queryResolver) GetUserNotification(ctx context.Context) ([]*model.Notif
 	userID := ctx.Value("TokenHeader").(string)
 	var notifs []*model.Notification
 
-	return notifs, r.Database.Where("user_id = ?", userID).Order("created_at DESC").Preload("FromUser").Find(&notifs).Error
+	blockedSubquery := r.Database.Table("user_blockedusers").Select("user_id").Where("blocked_user_id = ?", userID)
+
+	return notifs, r.Database.Debug().Where("user_id = ? AND from_user_id NOT IN (?)", userID, blockedSubquery).Order("created_at DESC").Preload("FromUser").Find(&notifs).Error
+}
+
+// GetUserNotificationLength is the resolver for the getUserNotificationLength field.
+func (r *queryResolver) GetUserNotificationLength(ctx context.Context) (int, error) {
+	userID := ctx.Value("TokenHeader").(string)
+
+	blockedSubquery := r.Database.Table("user_blockedusers").Select("user_id").Where("blocked_user_id = ?", userID)
+
+	var count int64
+	err := r.Database.Model(&model.Notification{}).Where("user_id = ? AND from_user_id NOT IN (?) AND read = ?", userID, blockedSubquery, false).Count(&count).Error
+
+	return int(count), err
 }
 
 // Notification returns graph.NotificationResolver implementation.

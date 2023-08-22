@@ -45,9 +45,10 @@ input NewUser {
 }
 
 type Query {
-  getUser(id: ID!): User!
-  getAllUser: [User!]!
-  getAllNonFriend(id: ID!): [User!]!
+  getUser(id: ID!): User! @auth
+  getAllUser: [User!]! 
+  getAllNonFriend(id: ID!): [User!]! @auth
+  getPeopleYouMayKnow(id: ID!): [User!]
 
 }
 
@@ -61,17 +62,19 @@ type Mutation {
   deleteUser(id: ID!): User!
   loginUser(inputCredential: LoginCredential!): UserAuthorization!
 
-  updateProfileImage(fileURL: String!): Boolean!
-  updateBannerImage(fileURL: String!): Boolean!
+  updateProfileImage(fileURL: String!): Boolean! @auth
+  updateBannerImage(fileURL: String!): Boolean! @auth
 
-  sendFriendRequest(friendID: ID!): Boolean!
-  acceptFriendRequest(friendID: ID!): Boolean!
-  rejectFriendRequest(friendID: ID!): Boolean!
-  blockUser(userID: ID!): Boolean!
+  sendFriendRequest(friendID: ID!): Boolean! @auth
+  acceptFriendRequest(friendID: ID!): Boolean! @auth
+  rejectFriendRequest(friendID: ID!): Boolean! @auth
+  blockUser(userID: ID!): Boolean! @auth
+  unblockUser(userID: ID!): Boolean! @auth
 
-  addSpecificFriend(friendID: ID!): Boolean!
-  removeSpecificFriend(friendID: ID!): Boolean!
+  addSpecificFriend(friendID: ID!): Boolean! @auth
+  removeSpecificFriend(friendID: ID!): Boolean! @auth
   
-  acceptGroupInvite(groupID: ID!): Boolean!
-  rejectGroupInvite(groupID: ID!): Boolean!
+  acceptGroupInvite(groupID: ID!): Boolean! @auth
+  rejectGroupInvite(groupID: ID!): Boolean! @auth
+
 }

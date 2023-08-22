@@ -1,4 +1,6 @@
 import { ShowGroup } from "./GroupModel"
+import { Post } from "./PostModel"
+// import { Post } from "./PostModel"
 import { ShowUser } from "./UserModel"
 
 export interface ChatRoom{
@@ -17,4 +19,5 @@ export interface Chat{
     fileURL: string
     createdAt: Date
     user: ShowUser
+    post: Post
 }

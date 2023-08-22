@@ -5,6 +5,7 @@ import { useMutation } from '@apollo/client';
 import { LOGIN_USER } from '../../query/UserQuery';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Footer from '../component/Footer';
 
 export default function LoginPage() {
 
@@ -69,6 +70,7 @@ export default function LoginPage() {
                 </div>
 
             </div>
+            <Footer/>
             <ToastContainer position="top-right"
                 autoClose={3000}
                 hideProgressBar={false}

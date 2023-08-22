@@ -6,6 +6,7 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -20,6 +21,14 @@ func (r *chatResolver) User(ctx context.Context, obj *model.Chat) (*model.User, 
 	return obj.User, nil
 }
 
+// Post is the resolver for the post field.
+func (r *chatResolver) Post(ctx context.Context, obj *model.Chat) (*model.Post, error) {
+	if obj.PostID == nil {
+		return nil, nil
+	}
+	return obj.Post, nil
+}
+
 // User is the resolver for the user field.
 func (r *chatRoomResolver) User(ctx context.Context, obj *model.ChatRoom) ([]*model.User, error) {
 	return obj.User, nil
@@ -27,7 +36,7 @@ func (r *chatRoomResolver) User(ctx context.Context, obj *model.ChatRoom) ([]*mo
 
 // Chat is the resolver for the chat field.
 func (r *chatRoomResolver) Chat(ctx context.Context, obj *model.ChatRoom) ([]*model.Chat, error) {
-	return service.GetChat(ctx, obj.ID)
+	return obj.Chat, nil
 }
 
 // Group is the resolver for the group field.
@@ -40,7 +49,6 @@ func (r *mutationResolver) CreateChatRoom(ctx context.Context, inputChatRoom mod
 	var users []*model.User
 	var groupID *string = nil
 
-	// Retrieve the users based on their IDs
 	for _, userID := range inputChatRoom.UserID {
 		user, err := service.GetUser(ctx, userID)
 		if err != nil {
@@ -53,7 +61,6 @@ func (r *mutationResolver) CreateChatRoom(ctx context.Context, inputChatRoom mod
 		groupID = inputChatRoom.GroupID
 	}
 
-	// Create the chat room object
 	room := &model.ChatRoom{
 		ID:        uuid.NewString(),
 		User:      users,
@@ -61,7 +68,6 @@ func (r *mutationResolver) CreateChatRoom(ctx context.Context, inputChatRoom mod
 		GroupID:   groupID,
 	}
 
-	// Save the chat room
 	if err := r.Database.Create(&room).Error; err != nil {
 		return nil, err
 	}
@@ -95,7 +101,8 @@ func (r *mutationResolver) CreateChat(ctx context.Context, inputChat model.NewCh
 	chat := &model.Chat{
 		ID:         uuid.NewString(),
 		Text:       inputChat.Text,
-		FileURL:    inputChat.Text,
+		FileURL:    inputChat.FileURL,
+		PostID:     inputChat.PostID,
 		UserID:     userID,
 		ChatRoomID: inputChat.ChatRoomID,
 		CreatedAt:  time.Now(),
@@ -128,11 +135,21 @@ func (r *mutationResolver) CreateChat(ctx context.Context, inputChat model.NewCh
 // GetAllChatRoom is the resolver for the getAllChatRoom field.
 func (r *queryResolver) GetAllChatRoom(ctx context.Context) ([]*model.ChatRoom, error) {
 	userID := ctx.Value("TokenHeader").(string)
+	// userID := "cbda7fec-145f-4cf8-a9f0-442ec7efcd0f"
 	var room []*model.ChatRoom
 	subquery := r.Database.Table("chatroom_users").Select("chat_room_id").Where("user_id = ?", userID)
-	return room, r.Database.Where("id IN (?)", subquery).Preload("User").Preload("Chat", func(db *gorm.DB) *gorm.DB {
-		return db.Order("created_at ASC")
-	}).Preload("Group").Find(&room).Error
+	return room, r.Database.Debug().Where("id IN (?)", subquery).Preload("Chat", func(db *gorm.DB) *gorm.DB {
+		return db.Order("created_at DESC").Preload("User").Preload("Post").Preload("Post.Comment", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+			Preload("Post.User").
+			Preload("Post.Comment.LikedBy").
+			Preload("Post.Comment.Replies").
+			Preload("Post.LikedBy").
+			Preload("Post.SharedBy").
+			Preload("Post.Tagged").
+			Preload("Post.Group").Limit(1)
+	}).Preload("User").Preload("Group").Find(&room).Error
 }
 
 // GetChatRoom is the resolver for the getChatRoom field.
@@ -156,6 +173,7 @@ func (r *subscriptionResolver) GetChat(ctx context.Context, chatRoomID string) (
 	}
 
 	chats, err := service.GetChat(ctx, chatRoomID)
+	fmt.Println(chats)
 	if err != nil {
 		close(r.ChatRoomChannel[chatRoomID][userID])
 	}

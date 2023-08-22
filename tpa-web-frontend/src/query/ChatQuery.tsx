@@ -119,6 +119,64 @@ subscription GetChat($chatRoomID: ID!){
       last_name
       profileImageURL
     }
+    post{
+      id
+      text
+      fileURL
+      user {
+        id
+        first_name
+        last_name
+        profileImageURL
+      }
+      likedBy {
+        id
+      }
+      comment {
+        id
+        text
+        parentID
+        createdAt
+        likedBy {
+          id
+        }
+        user {
+          id
+          first_name
+          last_name
+          profileImageURL
+        }
+        replies{
+          id
+          text
+          parentID
+          createdAt
+          likedBy {
+            id
+          }
+          user {
+            id
+            first_name
+            last_name
+            profileImageURL
+          }
+        }
+      }
+      sharedBy {
+        id
+      }
+      tagged{
+        id
+        first_name
+        last_name
+        profileImageURL
+      }
+      group{
+        id
+        name
+      }
+    createdAt
+    }
   }
 }
 `

@@ -89,6 +89,12 @@ func (r *mutationResolver) ChangePassword(ctx context.Context, email string, new
 		return false, err
 	}
 
+	same := helper.CheckPassword(user.Password, newPassword)
+	if same {
+		fmt.Println("same password")
+		return false, err
+	}
+
 	user.Password = helper.EncryptPassword(newPassword)
 	return true, r.Database.Save(&user).Error
 }
@@ -244,6 +250,19 @@ func (r *mutationResolver) BlockUser(ctx context.Context, userID string) (bool, 
 	return true, r.Database.Save(&user).Error
 }
 
+// UnblockUser is the resolver for the unblockUser field.
+func (r *mutationResolver) UnblockUser(ctx context.Context, userID string) (bool, error) {
+	currUserID := ctx.Value("TokenHeader").(string)
+	user, userErr := service.GetUser(ctx, currUserID)
+	blockUser, blockUserErr := service.GetUser(ctx, userID)
+
+	if userErr != nil || blockUserErr != nil {
+		return false, userErr
+	}
+
+	return true, r.Database.Model(&user).Association("BlockedUser").Delete(blockUser)
+}
+
 // AddSpecificFriend is the resolver for the addSpecificFriend field.
 func (r *mutationResolver) AddSpecificFriend(ctx context.Context, friendID string) (bool, error) {
 	userID := ctx.Value("TokenHeader").(string)
@@ -367,6 +386,29 @@ func (r *queryResolver) GetAllNonFriend(ctx context.Context, id string) ([]*mode
 	friendSubquery := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", id)
 
 	return users, r.Database.Where("id != ? AND id NOT IN (?)", id, friendSubquery).Preload("Friend").Preload("PendingFriend").Preload("BlockedUser").Preload("SpecificFriend").Preload("GroupInvite").Find(&users).Error
+}
+
+// GetPeopleYouMayKnow is the resolver for the getPeopleYouMayKnow field.
+func (r *queryResolver) GetPeopleYouMayKnow(ctx context.Context, id string) ([]*model.User, error) {
+	_, err := service.GetUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	var mayKnowUsers []*model.User
+
+	currSubquery := r.Database.Table("user_friends").Select("friend_id").Where("user_id = ?", id)
+	mayKnowSubquery := r.Database.Table("user_friends").Select("friend_id").Where("user_id IN (?)", currSubquery).Not("friend_id = ?", id)
+	err = r.Database.Preload("Friend").Preload("PendingFriend").Preload("BlockedUser").Preload("SpecificFriend").Preload("GroupInvite").Where("id IN (?)", mayKnowSubquery).
+		Not("id IN (?)", currSubquery).
+		Not("id = ?", id).Limit(5).
+		Find(&mayKnowUsers).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return mayKnowUsers, nil
 }
 
 // GroupInvite is the resolver for the groupInvite field.

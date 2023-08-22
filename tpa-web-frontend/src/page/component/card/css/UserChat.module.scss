@@ -1,11 +1,11 @@
-.chat-container{
+.chat-container {
 
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
     gap: 0.75rem;
 
-    .profile-icon{
+    .profile-icon {
 
         width: 2.5rem;
         height: 2.5rem;
@@ -13,42 +13,53 @@
         object-fit: cover;
     }
 
-    .chat-subcontainer{
+    .chat-subcontainer {
 
         display: flex;
         flex-direction: column;
         justify-content: center;
         gap: 0.25rem;
-        
-        h5{
+
+        h5 {
             align-self: self-end;
             font-weight: 500;
         }
 
-        .chat-content{
+        .chat-content {
 
             background-color: var(--default-blue-text);
             border-radius: 5px 10px 0px 10px;
             padding: 0.5rem;
             text-align: end;
 
-            span{
+            span {
                 font-size: small;
                 color: white;
+            }
+
+            .file {
+                max-width: 20rem;
+                max-height: 20rem;
+                object-fit: cover;
+            }
+            
+            .post {
+                text-align: start;
+                max-width: 30rem;
             }
         }
     }
 }
 
 
-.other-chat-container{
+.other-chat-container {
 
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 0.75rem;
 
-    .profile-icon{
+    .profile-icon {
 
         width: 2.5rem;
         height: 2.5rem;
@@ -56,25 +67,36 @@
         object-fit: cover;
     }
 
-    .other-chat-subcontainer{
+    .other-chat-subcontainer {
 
         display: flex;
         flex-direction: column;
         justify-content: center;
         gap: 0.25rem;
-        
-        h5{
+
+        h5 {
             font-weight: 500;
         }
 
-        .other-chat-content{
+        .other-chat-content {
 
             background-color: white;
             border-radius: 10px 5px 10px 0;
             padding: 0.5rem;
 
-            span{
+            span {
                 font-size: small;
+            }
+
+            .file {
+                max-width: 20rem;
+                max-height: 20rem;
+                object-fit: cover;
+            }
+
+            .post {
+                text-align: start;
+                max-width: 30rem;
             }
         }
     }

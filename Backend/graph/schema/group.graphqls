@@ -35,27 +35,28 @@ type GroupUser{
 
 extend type Query{
 
-    getAllUserGroup:[Group!]
-    getGroup(groupID: ID!): Group!
-    getAllGroupFile(groupID: ID!): [GroupFile!]
+    getAllUserGroup:[Group!] @auth
+    getGroup(groupID: ID!): Group! @auth
+    getAllGroupFile(groupID: ID!): [GroupFile!] @auth
 
-    checkAdminUser(groupID: ID!): Boolean!
-    getAllGroupUser(groupID: ID!): [GroupUser!]
-    getNonMemberUser(groupID: ID!): [User!]
+    checkAdminUser(groupID: ID!): Boolean! @auth
+    getAllGroupUser(groupID: ID!): [GroupUser!] @auth
+    getNonMemberUser(groupID: ID!): [User!] @auth
+    checkMember(groupID: ID!): Boolean! @auth
+    checkInvite(groupID: ID!): Boolean! @auth
 }
 
 extend type Mutation{
 
-    uploadGroupFile(inputGroupFile: NewGroupFile!): GroupFile!
-    createGroup(inputGroup: NewGroup!): Group!
-    promoteMember(groupID: ID!, userID: ID!): Boolean!
-    approveRequest(groupID: ID!, userID: ID!): Boolean!
-    rejectRequest(groupID: ID!, userID: ID!): Boolean!
-    kickMember(groupID: ID!, userID: ID!): Boolean!
-    editGroupBanner(groupID: ID!, fileURL: String!): Boolean!
-    deleteGroupFile(groupID: ID!, fileID: ID!): Boolean!
-    inviteFriend(groupID: ID!, userID: ID!): Boolean!
-    requestJoinGroup(groupID:ID!): Boolean!
-    leaveGroup(groupID: ID!): Boolean!
-    checkMember(groupID: ID!): Boolean!
+    uploadGroupFile(inputGroupFile: NewGroupFile!): GroupFile! @auth
+    createGroup(inputGroup: NewGroup!): Group! @auth
+    promoteMember(groupID: ID!, userID: ID!): Boolean! @auth 
+    approveRequest(groupID: ID!, userID: ID!): Boolean! @auth
+    rejectRequest(groupID: ID!, userID: ID!): Boolean! @auth
+    kickMember(groupID: ID!, userID: ID!): Boolean! @auth
+    editGroupBanner(groupID: ID!, fileURL: String!): Boolean! @auth
+    deleteGroupFile(groupID: ID!, fileID: ID!): Boolean! @auth
+    inviteFriend(groupID: ID!, userID: ID!): Boolean! @auth
+    requestJoinGroup(groupID:ID!): Boolean! @auth
+    leaveGroup(groupID: ID!): Boolean! @auth
 }
